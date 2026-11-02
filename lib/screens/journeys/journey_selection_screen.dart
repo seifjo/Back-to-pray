@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../data/journey_content.dart';
+import '../../data/journey_l10n.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/journey_provider.dart';
 import '../../core/theme/app_theme.dart';
 import './journey_detail_screen.dart';
@@ -15,9 +17,9 @@ class JourneySelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'رحلات التعافي',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          context.isArabic ? 'رحلات التعافي' : 'Recovery journeys',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: Consumer<JourneyProvider>(
@@ -35,7 +37,9 @@ class JourneySelectionScreen extends StatelessWidget {
   }
 
   Widget _buildJourneySelection(BuildContext context) {
-    final journeys = JourneyContent.allJourneys;
+    final journeys = JourneyContent.allJourneys
+        .map((journey) => JourneyL10n.localize(journey, !context.isArabic))
+        .toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -43,19 +47,21 @@ class JourneySelectionScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          const Text(
-            'اختر رحلتك',
-            style: TextStyle(
+          Text(
+            context.isArabic ? 'اختر رحلتك' : 'Choose your journey',
+            style: const TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'كل رحلة تبدأ بخطوة واحدة... ابدأ اليوم',
+          Text(
+            context.isArabic
+                ? 'كل رحلة تبدأ بخطوة واحدة... ابدأ اليوم'
+                : 'Every journey starts with one step. Begin today.',
             style: TextStyle(
               fontSize: 16,
-              color: Colors.white70,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 32),
@@ -126,9 +132,9 @@ class JourneySelectionScreen extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       journey.description,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white70,
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                         height: 1.5,
                       ),
                     ),

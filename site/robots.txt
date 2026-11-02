@@ -1,0 +1,5 @@
+# Replace REPLACE_WITH_YOUR_DOMAIN below with the deployed origin.
+User-agent: *
+Allow: /
+
+Sitemap: https://REPLACE_WITH_YOUR_DOMAIN/sitemap.xml

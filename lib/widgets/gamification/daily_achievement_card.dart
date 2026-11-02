@@ -79,7 +79,7 @@ const DailyAchievementCard({
                       achievement.description,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                     if (showStreak && achievement.currentStreak > 0) ...[

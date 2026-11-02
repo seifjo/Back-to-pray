@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Replace REPLACE_WITH_YOUR_DOMAIN in every <loc> with the deployed origin before submitting to search engines. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://REPLACE_WITH_YOUR_DOMAIN/</loc>
+    <lastmod>2026-11-02</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://REPLACE_WITH_YOUR_DOMAIN/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://REPLACE_WITH_YOUR_DOMAIN/ar.html"/>
+  </url>
+  <url>
+    <loc>https://REPLACE_WITH_YOUR_DOMAIN/ar.html</loc>
+    <lastmod>2026-11-02</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://REPLACE_WITH_YOUR_DOMAIN/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://REPLACE_WITH_YOUR_DOMAIN/ar.html"/>
+  </url>
+</urlset>

@@ -9,6 +9,9 @@
 
 # flutter_local_notifications rules
 -keep class com.dexterous.flutterlocalnotifications.** { *; }
+-keep class com.islamic.backtoprayer.back_to_prayer.PrayerAlertReceiver { *; }
+-keep class com.islamic.backtoprayer.back_to_prayer.PrayerBootReceiver { *; }
+-keep class com.islamic.backtoprayer.back_to_prayer.PrayerAlertService { *; }
 -keep class androidx.work.** { *; }
 -keep class android.support.v4.** { *; }
 -dontwarn com.dexterous.flutterlocalnotifications.**

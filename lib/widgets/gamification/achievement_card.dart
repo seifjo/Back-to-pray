@@ -129,9 +129,9 @@ class AchievementCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 _formatDate(achievement.unlockedDate!),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 10,
-                  color: Colors.white38,
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45),
                 ),
               ),
             ],

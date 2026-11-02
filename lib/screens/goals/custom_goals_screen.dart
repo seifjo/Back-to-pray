@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/theme/app_theme.dart';
 
 /// Custom Goals Screen
@@ -11,7 +14,34 @@ class CustomGoalsScreen extends StatefulWidget {
 }
 
 class _CustomGoalsScreenState extends State<CustomGoalsScreen> {
+  static const _storageKey = 'custom_goals';
   final List<Map<String, dynamic>> _goals = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_storageKey);
+    if (raw == null || !mounted) return;
+    final decoded = jsonDecode(raw);
+    if (decoded is! List) return;
+    setState(() {
+      _goals
+        ..clear()
+        ..addAll(decoded.whereType<Map>().map((item) => item.map(
+              (key, value) => MapEntry(key.toString(), value),
+            )));
+    });
+  }
+
+  Future<void> _save() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_storageKey, jsonEncode(_goals));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +78,7 @@ class _CustomGoalsScreenState extends State<CustomGoalsScreen> {
           Icon(
             Icons.emoji_events_outlined,
             size: 80,
-            color: Colors.white.withValues(alpha: 0.3),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 16),
           const Text(
@@ -63,7 +93,7 @@ class _CustomGoalsScreenState extends State<CustomGoalsScreen> {
             'أنشئ هدفك الخاص واتبع تقدمك',
             style: TextStyle(
               fontSize: 16,
-              color: Colors.white.withValues(alpha: 0.5),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
             ),
           ),
           const SizedBox(height: 32),
@@ -82,8 +112,8 @@ class _CustomGoalsScreenState extends State<CustomGoalsScreen> {
   }
 
   Widget _buildGoalCard(Map<String, dynamic> goal) {
-    final progress = goal['progress'] as double;
-    final target = goal['target'] as int;
+    final progress = (goal['progress'] as num?)?.toDouble() ?? 0;
+    final target = (goal['target'] as num?)?.toInt() ?? 1;
     final percentage = (progress / target * 100).clamp(0, 100);
 
     return Card(
@@ -137,12 +167,30 @@ class _CustomGoalsScreenState extends State<CustomGoalsScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            Text(
-              '${progress.toInt()} / $target',
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.white70,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '${progress.toInt()} / $target',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: progress >= target
+                      ? null
+                      : () {
+                          setState(() => goal['progress'] = progress + 1);
+                          _save();
+                        },
+                  icon: const Icon(Icons.add_circle_outline),
+                ),
+              ],
             ),
           ],
         ),
@@ -195,6 +243,7 @@ class _CustomGoalsScreenState extends State<CustomGoalsScreen> {
                     'progress': 0.0,
                   });
                 });
+                _save();
                 Navigator.pop(ctx);
               }
             },

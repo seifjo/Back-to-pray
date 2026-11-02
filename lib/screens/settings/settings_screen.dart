@@ -1,178 +1,401 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/rewards_provider.dart';
-import '../../core/theme/app_theme.dart';
 
-/// Settings Screen
-/// Theme management and app settings
+import '../../core/theme/app_theme.dart';
+import '../../l10n/app_localizations.dart';
+import '../../models/prayer_times.dart';
+import '../../providers/app_settings_provider.dart';
+import '../../providers/hijri_calendar_provider.dart';
+import '../../providers/prayer_provider.dart';
+import '../../providers/spiritual_journey_provider.dart';
+import '../../providers/worship_tracker_provider.dart';
+import '../../core/services/data_export_service.dart';
+import '../../core/services/device_feedback.dart';
+import '../../providers/rewards_provider.dart';
+import 'adhan_settings_screen.dart';
+import 'quran_audio_settings_screen.dart';
+
+/// Central settings for language, theme, alerts, and reading.
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final settings = context.watch<AppSettingsProvider>();
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'الإعدادات',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ),
-      body: Consumer<RewardsProvider>(
-        builder: (context, rewardsProvider, _) {
-          final ownedThemes = rewardsProvider.getOwnedThemes();
-          final hasExportFeature = rewardsProvider.isFeatureUnlocked('feature_export');
-
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              // Theme Management Section
-              const Text(
-                '🎨 إدارة الثيمات',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'اختر الثيم المفضل لك',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.white70,
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Default Theme Card
-              _buildThemeCard(
-                context,
-                title: 'الثيم الأصلي',
-                description: 'الألوان الافتراضية للتطبيق',
-                icon: '🏠',
-                themeId: null,
-                isActive: rewardsProvider.activeThemeId == null,
-                onTap: () => _applyTheme(context, null, rewardsProvider),
-              ),
-
-              const SizedBox(height: 12),
-
-              // Owned Themes
-              if (ownedThemes.isEmpty)
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      const Icon(
-                        Icons.lock_outline,
-                        size: 48,
-                        color: Colors.white38,
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'ليس لديك ثيمات إضافية',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'اذهب إلى متجر المكافآت لشراء ثيمات جديدة',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white.withValues(alpha: 0.5),
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              else
-                ...ownedThemes.map((theme) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _buildThemeCard(
-                      context,
-                      title: theme.title,
-                      description: theme.description,
-                      icon: theme.icon,
-                      themeId: theme.themeId,
-                      isActive: rewardsProvider.activeThemeId == theme.themeId,
-                      onTap: () => _applyTheme(
-                        context,
-                        theme.themeId,
-                        rewardsProvider,
-                      ),
-                    ),
-                  );
-                }),
-
-              const SizedBox(height: 32),
-
-              // Export Data Section (if unlocked)
-              if (hasExportFeature) ...[
-                const Divider(),
-                const SizedBox(height: 16),
-                const Text(
-                  '📤 تصدير البيانات',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: () => _exportData(context),
-                  icon: const Icon(Icons.download),
-                  label: const Text('تصدير بياناتي'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryGreen,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.all(16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'صدّر رحلتك وإنجازاتك كملف JSON',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white.withValues(alpha: 0.5),
-                  ),
-                ),
+      appBar: AppBar(title: Text(context.tr('settingsTitle'))),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _SectionTitle(context.tr('sectionAppearance')),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(context.tr('language')),
+            subtitle: Text(settings.isArabic ? context.tr('arabic') : context.tr('english')),
+            trailing: SegmentedButton<String>(
+              segments: [
+                ButtonSegment(value: 'ar', label: Text(context.tr('arabic'))),
+                ButtonSegment(value: 'en', label: Text(context.tr('english'))),
               ],
+              selected: {settings.locale.languageCode},
+              onSelectionChanged: (value) async {
+                final prayer = context.read<PrayerProvider>();
+                final hijri = context.read<HijriCalendarProvider>();
+                final worship = context.read<WorshipTrackerProvider>();
+                final journeys = context.read<SpiritualJourneyProvider>();
+                await settings.setLocale(Locale(value.first));
+                // Refresh scheduled notification text to match the new language.
+                try {
+                  await prayer.refreshPrayerTimes();
+                } catch (_) {}
+                try {
+                  await hijri.syncReminders();
+                } catch (_) {}
+                try {
+                  await worship.resyncReminders();
+                } catch (_) {}
+                try {
+                  await journeys.resyncReminders();
+                } catch (_) {}
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(context.tr('theme')),
+          const SizedBox(height: 8),
+          SegmentedButton<ThemeMode>(
+            segments: [
+              ButtonSegment(value: ThemeMode.light, label: Text(context.tr('themeLight'))),
+              ButtonSegment(value: ThemeMode.dark, label: Text(context.tr('themeDark'))),
+              ButtonSegment(value: ThemeMode.system, label: Text(context.tr('themeSystem'))),
             ],
-          );
-        },
+            selected: {settings.themeMode},
+            onSelectionChanged: (value) => settings.setThemeMode(value.first),
+          ),
+          const SizedBox(height: 20),
+          _SectionTitle(context.tr('darkColorThemes')),
+          Text(
+            context.tr('themeHint'),
+            style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.7)),
+          ),
+          const SizedBox(height: 12),
+          const _ThemePicker(),
+          const SizedBox(height: 24),
+          _SectionTitle(context.tr('sectionNotifications')),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.notifications_outlined),
+            title: Text(context.tr('openAdhanSettings')),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AdhanSettingsScreen()),
+              );
+            },
+          ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(context.tr('introSound')),
+            subtitle: Text(context.tr('introSoundHelp')),
+            value: settings.introSoundEnabled,
+            onChanged: (value) => settings.setIntroSoundEnabled(value),
+          ),
+          const SizedBox(height: 8),
+          _SectionTitle(context.tr('sectionQuranAudio')),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.record_voice_over_outlined),
+            title: Text(context.tr('quranAudioSettings')),
+            subtitle: Text(context.tr('quranReciter')),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const QuranAudioSettingsScreen(),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 8),
+          _SectionTitle(context.tr('sectionReading')),
+          Text(context.tr('arabicTextSize')),
+          const SizedBox(height: 4),
+          Text(
+            settings.adhkarFontSizeLabel(settings.isArabic),
+            style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.7)),
+          ),
+          const SizedBox(height: 8),
+          SegmentedButton<double>(
+            segments: [
+              ButtonSegment(
+                value: AppSettingsProvider.fontSmall,
+                label: Text(context.tr('fontSizeSmall')),
+              ),
+              ButtonSegment(
+                value: AppSettingsProvider.fontMedium,
+                label: Text(context.tr('fontSizeMedium')),
+              ),
+              ButtonSegment(
+                value: AppSettingsProvider.fontLarge,
+                label: Text(context.tr('fontSizeLarge')),
+              ),
+              ButtonSegment(
+                value: AppSettingsProvider.fontExtraLarge,
+                label: Text(context.tr('fontSizeExtraLarge')),
+              ),
+            ],
+            selected: {_nearestFontPreset(settings.adhkarFontSize)},
+            onSelectionChanged: (value) =>
+                settings.setAdhkarFontSize(value.first),
+          ),
+          const SizedBox(height: 8),
+          Slider(
+            min: AppSettingsProvider.fontSmall,
+            max: AppSettingsProvider.fontExtraLarge,
+            divisions: 10,
+            value: settings.adhkarFontSize.clamp(
+              AppSettingsProvider.fontSmall,
+              AppSettingsProvider.fontExtraLarge,
+            ),
+            label: settings.adhkarFontSize.round().toString(),
+            onChanged: (value) => settings.setAdhkarFontSize(value),
+          ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(context.tr('haptic')),
+            subtitle: Text(context.tr('hapticHelp')),
+            value: settings.hapticEnabled,
+            onChanged: (value) async {
+              await settings.setHapticEnabled(value);
+              if (value) await DeviceFeedback.vibrate();
+            },
+          ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(context.tr('showTranslation')),
+            subtitle: Text(context.tr('showTranslationHelp')),
+            isThreeLine: true,
+            value: settings.showTranslation,
+            onChanged: (value) => settings.setShowTranslation(value),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(context.tr('replayIntro')),
+            trailing: const Icon(Icons.replay),
+            onTap: () => settings.setJourneyIntroSeen(false),
+          ),
+          const SizedBox(height: 8),
+          _SectionTitle(context.tr('sectionPrayerCalc')),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.calculate_outlined),
+            title: Text(context.tr('calculationMethod')),
+            subtitle: Text(
+              context.read<PrayerProvider>().calculationMethod.localizedName(
+                    !context.isArabic,
+                  ),
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _showMethods(context),
+          ),
+          const SizedBox(height: 12),
+          Text(context.tr('timeFormat')),
+          const SizedBox(height: 4),
+          Text(
+            context.tr('timeFormatHelp'),
+            style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.7)),
+          ),
+          const SizedBox(height: 8),
+          SegmentedButton<bool>(
+            segments: [
+              ButtonSegment(value: false, label: Text(context.tr('hour12'))),
+              ButtonSegment(value: true, label: Text(context.tr('hour24'))),
+            ],
+            selected: {settings.use24HourClock},
+            onSelectionChanged: (value) => settings.setUse24HourClock(value.first),
+          ),
+          const SizedBox(height: 8),
+          _SectionTitle(context.tr('sectionAbout')),
+          Text(context.tr('appInfo'), style: const TextStyle(height: 1.5)),
+          const SizedBox(height: 12),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(context.tr('version')),
+            subtitle: const Text('1.0.1+5'),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(context.tr('privacy')),
+            subtitle: Text(context.tr('privacyBody')),
+            isThreeLine: true,
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(context.tr('permissionsInfo')),
+            subtitle: Text(context.tr('permissionsBody')),
+            isThreeLine: true,
+          ),
+          FilledButton.icon(
+            onPressed: () => _exportData(context),
+            icon: const Icon(Icons.download),
+            label: Text(context.tr('exportData')),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildThemeCard(
-    BuildContext context, {
-    required String title,
-    required String description,
-    required String icon,
-    required String? themeId,
-    required bool isActive,
-    required VoidCallback onTap,
-  }) {
+  double _nearestFontPreset(double size) {
+    const presets = [
+      AppSettingsProvider.fontSmall,
+      AppSettingsProvider.fontMedium,
+      AppSettingsProvider.fontLarge,
+      AppSettingsProvider.fontExtraLarge,
+    ];
+    return presets.reduce(
+      (a, b) => (a - size).abs() <= (b - size).abs() ? a : b,
+    );
+  }
+
+  void _showMethods(BuildContext context) {
+    final provider = context.read<PrayerProvider>();
+    final english = !context.isArabic;
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.tr('calculationMethod')),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView(
+            shrinkWrap: true,
+            children: CalculationMethod.values.map((method) {
+              return RadioListTile<CalculationMethod>(
+                title: Text(method.localizedName(english)),
+                value: method,
+                groupValue: provider.calculationMethod,
+                onChanged: (value) {
+                  if (value != null) {
+                    provider.changeCalculationMethod(value);
+                    Navigator.pop(context);
+                  }
+                },
+              );
+            }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _exportData(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final message = context.tr('exportReady');
+    try {
+      await DataExportService().shareExport();
+      messenger.showSnackBar(SnackBar(content: Text(message)));
+    } catch (error) {
+      messenger.showSnackBar(SnackBar(content: Text('$error')));
+    }
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  final String text;
+  const _SectionTitle(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8, top: 8),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+      ),
+    );
+  }
+}
+
+class _ThemePicker extends StatelessWidget {
+  const _ThemePicker();
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<RewardsProvider>(
+      builder: (context, rewards, _) {
+        final owned = rewards.getOwnedThemes();
+        return Column(
+          children: [
+            _ThemeCard(
+              title: context.tr('originalTheme'),
+              description: context.tr('defaultThemeDesc'),
+              icon: '🏠',
+              active: rewards.activeThemeId == null,
+              onTap: () {
+                rewards.resetToDefaultTheme();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(context.tr('themeRestored'))),
+                );
+              },
+            ),
+            const SizedBox(height: 12),
+            if (owned.isEmpty)
+              Text(context.tr('noExtraThemes'))
+            else
+              ...owned.map(
+                (theme) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _ThemeCard(
+                    title: theme.title,
+                    description: theme.description,
+                    icon: theme.icon,
+                    active: rewards.activeThemeId == theme.themeId,
+                    onTap: () {
+                      final themeId = theme.themeId;
+                      if (themeId == null) return;
+                      rewards.setActiveTheme(themeId);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(context.tr('themeApplied'))),
+                      );
+                    },
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _ThemeCard extends StatelessWidget {
+  final String title;
+  final String description;
+  final String icon;
+  final bool active;
+  final VoidCallback onTap;
+
+  const _ThemeCard({
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.active,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Card(
-      elevation: isActive ? 8 : 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: isActive
+        side: active
             ? const BorderSide(color: AppTheme.accentCyan, width: 2)
-            : BorderSide.none,
+            : BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.4)),
       ),
       child: InkWell(
         onTap: onTap,
@@ -181,106 +404,21 @@ class SettingsScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              // Theme Icon
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: isActive
-                      ? AppTheme.accentCyan.withValues(alpha: 0.2)
-                      : Colors.white.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Text(
-                    icon,
-                    style: const TextStyle(fontSize: 32),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              // Theme Info
+              Text(icon, style: const TextStyle(fontSize: 28)),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: isActive ? AppTheme.accentCyan : Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      description,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.white70,
-                      ),
-                    ),
+                    Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+                    Text(description),
                   ],
                 ),
               ),
-              // Active Indicator
-              if (isActive)
-                const Icon(
-                  Icons.check_circle,
-                  color: AppTheme.accentCyan,
-                  size: 28,
-                ),
+              if (active) const Icon(Icons.check_circle, color: AppTheme.accentCyan),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  void _applyTheme(
-    BuildContext context,
-    String? themeId,
-    RewardsProvider provider,
-  ) {
-    if (themeId == null) {
-      provider.resetToDefaultTheme();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('تم استعادة الثيم الأصلي'),
-          backgroundColor: AppTheme.primaryGreen,
-        ),
-      );
-    } else {
-      provider.setActiveTheme(themeId);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('تم تطبيق الثيم الجديد'),
-          backgroundColor: AppTheme.primaryGreen,
-        ),
-      );
-    }
-  }
-
-  void _exportData(BuildContext context) {
-    // TODO: Implement actual data export
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('تصدير البيانات'),
-        content: const Text(
-          'سيتم قريباً تنفيذ ميزة تصدير البيانات.\n\n'
-          'ستتمكن من حفظ:\n'
-          '• تقدم رحلتك\n'
-          '• إنجازاتك\n'
-          '• إحصائياتك\n\n'
-          'كملف JSON على جهازك.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('حسناً'),
-          ),
-        ],
       ),
     );
   }

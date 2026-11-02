@@ -7,6 +7,8 @@ import '../../core/theme/app_theme.dart';
 import '../../models/journey.dart';
 import '../emergency/emergency_adhkar_screen.dart';
 import '../stats/advanced_stats_screen.dart';
+import '../../data/journey_l10n.dart';
+import '../../l10n/app_localizations.dart';
 import 'journey_detail_screen.dart';
 
 /// Active Journey Dashboard
@@ -18,15 +20,20 @@ class ActiveJourneyDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer3<JourneyProvider, GamificationProvider, RewardsProvider>(
       builder: (context, journeyProvider, gamProvider, rewardsProvider, child) {
-        final journey = journeyProvider.getCurrentJourney();
+        final sourceJourney = journeyProvider.getCurrentJourney();
+        final journey = sourceJourney == null
+            ? null
+            : JourneyL10n.localize(sourceJourney, !context.isArabic);
         final activeJourney = journeyProvider. activeJourney;
 
         if (journey == null || activeJourney == null) {
           return const Center(child: Text('لا توجد رحلة نشطة'));
         }
 
-        final currentStage = journeyProvider.getCurrentStage();
         final stageIndex = journeyProvider.getCurrentStageIndex();
+        final currentStage = journey.stages.isEmpty
+            ? null
+            : journey.stages[stageIndex.clamp(0, journey.stages.length - 1)];
         final progress = journeyProvider.getRecoveryProgress();
         final isTodayLogged = activeJourney.isTodayLogged();
 
@@ -57,9 +64,9 @@ class ActiveJourneyDashboard extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           'بدأت منذ ${activeJourney.getDaysSinceStart()} يوم',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
-                            color: Colors.white70,
+                            color: const Color(0xFF64748B),
                           ),
                         ),
                       ],
@@ -134,7 +141,7 @@ class ActiveJourneyDashboard extends StatelessWidget {
                       'توقف! خذ 90 ثانية للمقاومة',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white70,
+                        color: Color(0xFF64748B),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -303,7 +310,7 @@ class ActiveJourneyDashboard extends StatelessWidget {
             'يوم متواصل',
             style: TextStyle(
               fontSize: 18,
-              color: Colors.white70,
+              color: Color(0xFF64748B),
             ),
           ),
         ],
@@ -353,9 +360,9 @@ class ActiveJourneyDashboard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               '$totalDays من $recommendedDays يوم',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: Colors.white70,
+                color: const Color(0xFF64748B),
               ),
             ),
           ],
@@ -413,7 +420,7 @@ class ActiveJourneyDashboard extends StatelessWidget {
               stage.description,
               style: const TextStyle(
                 fontSize: 14,
-                color: Colors.white70,
+                color: Color(0xFF64748B),
                 height: 1.5,
               ),
             ),
@@ -479,7 +486,7 @@ class ActiveJourneyDashboard extends StatelessWidget {
                   'لقد سجلت التزامك اليوم بنجاح 🎉',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white70,
+                    color: const Color(0xFF64748B),
                   ),
                 ),
               ],
@@ -531,9 +538,9 @@ class ActiveJourneyDashboard extends StatelessWidget {
             Text(
               label,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
-                color: Colors.white70,
+                color: const Color(0xFF64748B),
               ),
             ),
           ],
@@ -645,6 +652,14 @@ class ActiveJourneyDashboard extends StatelessWidget {
             // Paused removed as requested
             const Divider(),
             ListTile(
+              leading: const Icon(Icons.replay),
+              title: Text(context.tr('restartJourney')),
+              onTap: () {
+                Navigator.pop(ctx);
+                _confirmRestart(context, provider);
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.delete, color: Colors.red),
               title: const Text(
                 'إنهاء الرحلة',
@@ -657,6 +672,29 @@ class ActiveJourneyDashboard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _confirmRestart(BuildContext context, JourneyProvider provider) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(context.tr('restartJourney')),
+        content: Text(context.tr('restartConfirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(context.tr('cancel')),
+          ),
+          FilledButton(
+            onPressed: () {
+              provider.restartJourney();
+              Navigator.pop(ctx);
+            },
+            child: Text(context.tr('restartJourney')),
+          ),
+        ],
       ),
     );
   }

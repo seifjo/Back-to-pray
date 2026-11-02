@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:geolocator/geolocator.dart';
 import '../models/prayer_times.dart';
 import '../core/services/prayer_time_service.dart';
 import '../core/services/notification_service.dart';
@@ -12,11 +13,12 @@ class PrayerProvider extends ChangeNotifier {
   final NotificationService _notificationService = NotificationService();
 
   PrayerTimes? _prayerTimes;
-  bool _isLoading = false;
+  bool _isLoading = true;
   String? _error;
   CalculationMethod _calculationMethod = CalculationMethod.egyptianGeneralAuthority;
   String? _locationName;
   Timer? _updateTimer;
+  bool _refreshing = false;
 
   // Getters
   PrayerTimes? get prayerTimes => _prayerTimes;
@@ -26,7 +28,9 @@ class PrayerProvider extends ChangeNotifier {
   String? get locationName => _locationName;
 
   PrayerProvider() {
-    _initialize();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future<void>.delayed(const Duration(milliseconds: 400), _initialize);
+    });
   }
 
   /// Initialize prayer provider
@@ -49,27 +53,40 @@ class PrayerProvider extends ChangeNotifier {
 
   /// Refresh prayer times
   Future<void> refreshPrayerTimes() async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
+    if (_refreshing) return;
+    _refreshing = true;
+    final showSpinner = _prayerTimes == null;
+    if (showSpinner) {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+    }
 
     try {
-      _prayerTimes = await _prayerTimeService.getTodayPrayerTimes();
-      
-      // Schedule notifications
-      if (_prayerTimes != null) {
-        await _notificationService.schedulePrayerNotifications(_prayerTimes!);
-      }
-
+      final pair = await _prayerTimeService.getTodayAndTomorrow();
+      _prayerTimes = pair.today;
       _error = null;
+
+      try {
+        await _notificationService.reschedulePrayerNotifications(
+          today: pair.today,
+          tomorrow: pair.tomorrow,
+        );
+      } catch (_) {}
     } catch (e) {
-      if (e.toString().contains('denied')) {
-        _error = 'تم رفض الإذن بالوصול للموقع. يرجى تفعيله من الإعدادات.';
+      final message = e.toString().toLowerCase();
+      if (message.contains('disabled')) {
+        _error = 'location_disabled';
+      } else if (message.contains('denied')) {
+        _error = 'location_denied';
+      } else if (message.contains('timeout')) {
+        _error = 'location_timeout';
       } else {
-        _error = 'خطأ في تحميل مواعيد الصلاة: ${e.toString()}';
+        _error = 'prayer_load_failed';
       }
       print('Error refreshing prayer times: $e');
     } finally {
+      _refreshing = false;
       _isLoading = false;
       notifyListeners();
     }
@@ -77,7 +94,16 @@ class PrayerProvider extends ChangeNotifier {
 
   /// Request permissions explicitly
   Future<void> requestPermissions() async {
-    await _prayerTimeService.getCurrentLocation();
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      await Geolocator.openLocationSettings();
+    }
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    if (permission == LocationPermission.deniedForever) {
+      await Geolocator.openAppSettings();
+    }
     await refreshPrayerTimes();
   }
 

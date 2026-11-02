@@ -1,74 +1,44 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+
+import 'package:flutter/services.dart';
+
+import '../../data/quran_data.dart';
 import '../../models/quran.dart';
 
-/// Quran Service
-/// Fetches Quran data from Quran.com API (V4)
+/// The Uthmani text is bundled with the app, so reading works without internet.
 class QuranService {
-  static const String _baseUrl = 'https://api.quran.com/api/v4';
+  Map<String, List<String>>? _verses;
 
-  /// Get list of all 114 surahs
-  Future<List<Surah>> getAllSurahs() async {
-    try {
-      final response = await http.get(Uri.parse('$_baseUrl/chapters?language=ar'));
-      
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final List surahsJson = data['chapters'];
-        
-        return surahsJson.map((json) => Surah(
-          number: json['id'],
-          name: json['name_arabic'],
-          englishName: json['name_complex'],
-          ayahs: [],
-        )).toList();
-      } else {
-        throw Exception('Failed to load surahs');
-      }
-    } catch (e) {
-      print('Error loading surahs: $e');
-      rethrow;
+  Future<List<Surah>> getAllSurahs() async => QuranData.surahs;
+
+  Future<Surah> getSurahDetail(int surahNumber) async {
+    final verses = await _load();
+    final lines = verses['$surahNumber'];
+    if (lines == null || lines.isEmpty) {
+      throw Exception('Surah $surahNumber is not in the local Quran text');
     }
+    final meta = QuranData.surahs.firstWhere((surah) => surah.number == surahNumber);
+    return Surah(
+      number: surahNumber,
+      name: meta.name,
+      englishName: meta.englishName,
+      ayahs: [
+        for (var i = 0; i < lines.length; i++)
+          Ayah(number: i + 1, text: lines[i], juz: 0, page: 0),
+      ],
+    );
   }
 
-  /// Get full surah with ayahs
-  Future<Surah> getSurahDetail(int surahNumber) async {
-    try {
-      // Fetch Uthmani text with a high per_page to get all ayahs at once
-      // Baqarah is 286 ayahs, so 300 is enough.
-      final response = await http.get(
-        Uri.parse('$_baseUrl/quran/verses/uthmani?chapter_number=$surahNumber')
-      );
-      
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final List verses = data['verses'];
-        
-        final List<Ayah> ayahs = verses.map((v) {
-          // verse_key is e.g. "1:1", "1:2"
-          final keyParts = v['verse_key'].split(':');
-          final verseNumber = int.parse(keyParts[1]);
-          
-          return Ayah(
-            number: verseNumber,
-            text: v['text_uthmani'],
-            juz: 0, // Simplified for now to ensure stability
-            page: 0,
-          );
-        }).toList();
-        
-        return Surah(
-          number: surahNumber,
-          name: '', 
-          englishName: '',
-          ayahs: ayahs,
-        );
-      } else {
-        throw Exception('Failed to load surah details');
-      }
-    } catch (e) {
-      print('Error loading surah details: $e');
-      rethrow;
-    }
+  Future<Map<String, List<String>>> _load() async {
+    final existing = _verses;
+    if (existing != null) return existing;
+    final raw = await rootBundle.loadString('assets/quran/uthmani.json');
+    final decoded = json.decode(raw) as Map<String, dynamic>;
+    final verses = <String, List<String>>{
+      for (final entry in decoded.entries)
+        entry.key: (entry.value as List).map((line) => line.toString()).toList(),
+    };
+    _verses = verses;
+    return verses;
   }
 }

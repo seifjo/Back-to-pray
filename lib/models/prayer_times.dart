@@ -105,6 +105,35 @@ enum CalculationMethod {
 
 /// Extension to get Arabic names for calculation methods
 extension CalculationMethodArabic on CalculationMethod {
+  String localizedName(bool english) => english ? englishName : arabicName;
+
+  String get englishName {
+    switch (this) {
+      case CalculationMethod.egyptianGeneralAuthority:
+        return 'Egyptian General Authority of Survey';
+      case CalculationMethod.ummAlQura:
+        return 'Umm al-Qura (Saudi Arabia)';
+      case CalculationMethod.isna:
+        return 'ISNA (North America)';
+      case CalculationMethod.muslimWorldLeague:
+        return 'Muslim World League';
+      case CalculationMethod.karachi:
+        return 'University of Islamic Sciences, Karachi';
+      case CalculationMethod.dubai:
+        return 'Dubai';
+      case CalculationMethod.kuwait:
+        return 'Kuwait';
+      case CalculationMethod.qatar:
+        return 'Qatar';
+      case CalculationMethod.singapore:
+        return 'Singapore';
+      case CalculationMethod.northAmerica:
+        return 'North America';
+      case CalculationMethod.other:
+        return 'Other';
+    }
+  }
+
   String get arabicName {
     switch (this) {
       case CalculationMethod.egyptianGeneralAuthority:
@@ -130,5 +159,22 @@ extension CalculationMethodArabic on CalculationMethod {
       case CalculationMethod.other:
         return 'أخرى';
     }
+  }
+}
+
+/// Displays a prayer clock time as 24-hour or 12-hour.
+class PrayerClock {
+  static String format(
+    DateTime time, {
+    required bool use24Hour,
+    required bool arabic,
+  }) {
+    final minute = time.minute.toString().padLeft(2, '0');
+    if (use24Hour) {
+      return '${time.hour.toString().padLeft(2, '0')}:$minute';
+    }
+    final hour12 = time.hour % 12 == 0 ? 12 : time.hour % 12;
+    final suffix = time.hour < 12 ? (arabic ? 'ص' : 'AM') : (arabic ? 'م' : 'PM');
+    return '$hour12:$minute $suffix';
   }
 }

@@ -1,0 +1,71 @@
+import '../models/worship_tracker.dart';
+
+/// Suggested activities users can enable. Completions are never auto-marked.
+class WorshipTrackerCatalog {
+  static const presets = <WorshipActivity>[
+    WorshipActivity(
+      id: 'prayer_daily',
+      kind: WorshipActivityKind.prayer,
+      titleEn: 'Daily prayers',
+      titleAr: 'الصلوات اليومية',
+      noteEn: 'A personal checklist for the five daily prayers.',
+      noteAr: 'قائمة شخصية لمتابعة الصلوات الخمس.',
+      nature: WorshipGoalNature.obligation,
+      sortOrder: 0,
+    ),
+    WorshipActivity(
+      id: 'quran_read',
+      kind: WorshipActivityKind.quran,
+      titleEn: 'Quran reading',
+      titleAr: 'قراءة القرآن',
+      noteEn: 'Open the Quran when you like. Mark complete yourself.',
+      noteAr: 'افتح القرآن متى شئت. أكمل بنفسك عند الانتهاء.',
+      nature: WorshipGoalNature.personal,
+      sortOrder: 1,
+      shortcut: 'quran',
+    ),
+    WorshipActivity(
+      id: 'adhkar_morning',
+      kind: WorshipActivityKind.adhkar,
+      titleEn: 'Morning Adhkar',
+      titleAr: 'أذكار الصباح',
+      noteEn: 'Use the Adhkar section, then check this off when done.',
+      noteAr: 'استخدم قسم الأذكار، ثم علّم إتمامها هنا.',
+      nature: WorshipGoalNature.personal,
+      sortOrder: 2,
+      shortcut: 'adhkar',
+    ),
+    WorshipActivity(
+      id: 'adhkar_evening',
+      kind: WorshipActivityKind.adhkar,
+      titleEn: 'Evening Adhkar',
+      titleAr: 'أذكار المساء',
+      noteEn: 'Use the Adhkar section, then check this off when done.',
+      noteAr: 'استخدم قسم الأذكار، ثم علّم إتمامها هنا.',
+      nature: WorshipGoalNature.personal,
+      sortOrder: 3,
+      shortcut: 'adhkar',
+    ),
+    WorshipActivity(
+      id: 'tasbeeh',
+      kind: WorshipActivityKind.tasbeeh,
+      titleEn: 'Tasbeeh',
+      titleAr: 'التسبيح',
+      noteEn: 'Count with Digital Tasbeeh, then mark here yourself.',
+      noteAr: 'استخدم التسبيح الرقمي، ثم سجّل الإتمام هنا.',
+      nature: WorshipGoalNature.personal,
+      sortOrder: 4,
+      shortcut: 'tasbeeh',
+    ),
+    WorshipActivity(
+      id: 'learning',
+      kind: WorshipActivityKind.learning,
+      titleEn: 'Islamic learning',
+      titleAr: 'تعلّم إسلامي',
+      noteEn: 'Hadith, Names of Allah, or any study you choose.',
+      noteAr: 'حديث أو أسماء الله أو أي دراسة تختارها.',
+      nature: WorshipGoalNature.personal,
+      sortOrder: 5,
+    ),
+  ];
+}

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
+import '../../providers/app_settings_provider.dart';
 import '../../providers/prayer_provider.dart';
 import '../../core/theme/app_theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/prayer_times.dart';
 import '../settings/settings_screen.dart';
 
@@ -37,13 +39,14 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final use24Hour = context.watch<AppSettingsProvider>().use24HourClock;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('مواعيد الصلاة', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(context.tr('prayerTimes'), style: const TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.palette),
-            tooltip: 'الثيمات والإعدادات',
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: context.tr('themesAndSettings'),
             onPressed: () {
               Navigator.push(
                 context,
@@ -54,7 +57,8 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.settings),
+            icon: const Icon(Icons.calculate_outlined),
+            tooltip: context.tr('calculationMethod'),
             onPressed: () => _showCalculationMethodDialog(context),
           ),
           IconButton(
@@ -80,15 +84,32 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
                 children: [
                   const Icon(Icons.error_outline, size: 64, color: Colors.red),
                   const SizedBox(height: 16),
-                  Text(
-                    provider.error!,
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
-                    textAlign: TextAlign.center,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Text(
+                      switch (provider.error) {
+                        'location_denied' => context.tr('locationDenied'),
+                        'location_disabled' => context.tr('locationDisabled'),
+                        'location_timeout' => context.tr('locationTimeout'),
+                        _ => context.tr('prayerLoadError'),
+                      },
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => provider.refreshPrayerTimes(),
-                    child: const Text('إعادة المحاولة'),
+                    onPressed: () => provider.requestPermissions(),
+                    child: Text(
+                      provider.error == 'location_denied' ||
+                              provider.error == 'location_disabled' ||
+                              provider.error == 'location_timeout'
+                          ? context.tr('enableLocation')
+                          : context.tr('retry'),
+                    ),
                   ),
                 ],
               ),
@@ -96,8 +117,14 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
           }
 
           if (provider.prayerTimes == null) {
-            return const Center(
-              child: Text('لا توجد مواعيد صلاة', style: TextStyle(fontSize: 18, color: Colors.white)),
+            return Center(
+              child: Text(
+                context.tr('noPrayerTimes'),
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
             );
           }
 
@@ -113,7 +140,18 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
                 children: [
                   // Next Prayer Card with Countdown
                   _buildNextPrayerCard(nextPrayer),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
+                  SegmentedButton<bool>(
+                    segments: [
+                      ButtonSegment(value: false, label: Text(context.tr('hour12'))),
+                      ButtonSegment(value: true, label: Text(context.tr('hour24'))),
+                    ],
+                    selected: {use24Hour},
+                    onSelectionChanged: (value) {
+                      context.read<AppSettingsProvider>().setUse24HourClock(value.first);
+                    },
+                  ),
+                  const SizedBox(height: 16),
                   
                   // All Prayer Times
                   _buildPrayerTimesList(prayerTimes, nextPrayer?['name'] as String?),
@@ -157,9 +195,9 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
         ),
         child: Column(
           children: [
-            const Text(
-              'الصلاة القادمة',
-              style: TextStyle(
+            Text(
+              context.tr('nextPrayer'),
+              style: const TextStyle(
                 fontSize: 16,
                 color: Colors.white70,
                 fontWeight: FontWeight.w500,
@@ -167,7 +205,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              prayerName,
+              context.l10n.prayerName(prayerName),
               style: const TextStyle(
                 fontSize: 36,
                 color: Colors.white,
@@ -178,15 +216,15 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildTimeUnit(hours.toString().padLeft(2, '0'), 'ساعة'),
+                _buildTimeUnit(hours.toString().padLeft(2, '0'), context.tr('hours')),
                 const SizedBox(width: 8),
                 const Text(':', style: TextStyle(fontSize: 32, color: Colors.white)),
                 const SizedBox(width: 8),
-                _buildTimeUnit(minutes.toString().padLeft(2, '0'), 'دقيقة'),
+                _buildTimeUnit(minutes.toString().padLeft(2, '0'), context.tr('minutes')),
                 const SizedBox(width: 8),
                 const Text(':', style: TextStyle(fontSize: 32, color: Colors.white)),
                 const SizedBox(width: 8),
-                _buildTimeUnit(seconds.toString().padLeft(2, '0'), 'ثانية'),
+                _buildTimeUnit(seconds.toString().padLeft(2, '0'), context.tr('seconds')),
               ],
             ),
             const SizedBox(height: 12),
@@ -266,11 +304,13 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
           ),
         ),
         title: Text(
-          prayerName,
+          context.l10n.prayerName(prayerName),
           style: TextStyle(
             fontSize: 24,
             fontWeight: isNext ? FontWeight.bold : FontWeight.w600,
-            color: isNext ? AppTheme.getPrayerColor(prayerName) : Colors.white,
+            color: isNext
+                ? AppTheme.getPrayerColor(prayerName)
+                : Theme.of(context).colorScheme.onSurface,
           ),
         ),
         trailing: Column(
@@ -282,13 +322,18 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: isNext ? AppTheme.getPrayerColor(prayerName) : Colors.white,
+                color: isNext
+                    ? AppTheme.getPrayerColor(prayerName)
+                    : Theme.of(context).colorScheme.onSurface,
               ),
             ),
             if (isNext)
-              const Text(
-                'القادمة',
-                style: TextStyle(fontSize: 12, color: Colors.white70),
+              Text(
+                context.tr('upcoming'),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
               ),
           ],
         ),
@@ -316,9 +361,13 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
     }
   }
 
-  /// Format time to HH:mm
   String _formatTime(DateTime time) {
-    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+    final settings = context.read<AppSettingsProvider>();
+    return PrayerClock.format(
+      time,
+      use24Hour: settings.use24HourClock,
+      arabic: context.isArabic,
+    );
   }
 
   /// Show calculation method selection dialog
@@ -328,22 +377,27 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('طريقة الحساب', textAlign: TextAlign.center),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: CalculationMethod.values.map((method) {
-            return RadioListTile<CalculationMethod>(
-              title: Text(method.arabicName, textAlign: TextAlign.right),
-              value: method,
-              groupValue: provider.calculationMethod,
-              onChanged: (value) {
-                if (value != null) {
-                  provider.changeCalculationMethod(value);
-                  Navigator.pop(context);
-                }
-              },
-            );
-          }).toList(),
+        title: Text(context.tr('calculationMethod'), textAlign: TextAlign.center),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: CalculationMethod.values.map((method) {
+                return RadioListTile<CalculationMethod>(
+                  title: Text(method.localizedName(!context.isArabic)),
+                  value: method,
+                  groupValue: provider.calculationMethod,
+                  onChanged: (value) {
+                    if (value != null) {
+                      provider.changeCalculationMethod(value);
+                      Navigator.pop(context);
+                    }
+                  },
+                );
+              }).toList(),
+            ),
+          ),
         ),
       ),
     );

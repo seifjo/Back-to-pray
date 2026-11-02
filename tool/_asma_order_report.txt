@@ -1,0 +1,103 @@
+catalog=99
+OK 01 ar-rahmaan
+OK 02 ar-raheem
+OK 03 al-malik
+OK 04 al-quddoos
+OK 05 as-salaam
+OK 06 al-mumin
+OK 07 al-muhaymin
+OK 08 al-azeez
+OK 09 al-jabbaar
+OK 10 al-mutakabbir
+OK 11 al-khaaliq
+OK 12 al-baari
+OK 13 al-musawwir
+OK 14 al-ghaffaar
+OK 15 al-qahhaar
+OK 16 al-wahhaab
+OK 17 ar-razzaaq
+OK 18 al-fattaah
+OK 19 al-aleem
+OK 20 al-qaabid
+OK 21 al-baasit
+MISS 22
+MISS 23
+MISS 24
+MISS 25
+OK 26 as-samee
+OK 27 al-baseer
+OK 28 al-hakam
+MISS 29
+OK 30 al-lateef
+OK 31 al-khabeer
+OK 32 al-haleem
+OK 33 al-adheem
+OK 34 al-ghafoor
+OK 35 ash-shakoor
+OK 36 al-aliyy
+OK 37 al-kabeer
+OK 38 al-hafeedh
+OK 39 al-muqeet
+OK 40 al-haseeb
+MISS 41
+OK 42 al-kareem
+OK 43 ar-raqeeb
+OK 44 al-mujeeb
+OK 45 al-waasi
+OK 46 al-hakeem
+OK 47 al-wadood
+OK 48 al-majeed
+MISS 49
+OK 50 ash-shaheed
+OK 51 al-haqq
+OK 52 al-wakeel
+OK 53 al-qawiyy
+OK 54 al-mateen
+OK 55 al-waliyy
+OK 56 al-hameed
+MISS 57
+MISS 58
+MISS 59
+MISS 60
+MISS 61
+OK 62 al-hayy
+OK 63 al-qayyoom
+MISS 64
+MISS 65
+OK 66 al-waahid
+OK 67 al-ahad
+OK 68 as-samad
+OK 69 al-qaadir
+OK 70 al-muqtadir
+OK 71 al-muqaddim
+OK 72 al-muakhkhir
+OK 73 al-awwal
+OK 74 al-aakhir
+OK 75 adh-dhaahir
+OK 76 al-baatin
+MISS 77
+OK 78 al-mutaali
+OK 79 al-barr
+OK 80 at-tawwaab
+MISS 81
+OK 82 al-afuww
+OK 83 ar-raoof
+MISS 84
+MISS 85
+MISS 86
+MISS 87
+OK 88 al-ghaniyy
+MISS 89
+MISS 90
+MISS 91
+MISS 92
+MISS 93
+MISS 94
+MISS 95
+MISS 96
+OK 97 al-waarith
+MISS 98
+MISS 99
+matched=69 remaining=30
+ORDER_IDS=ar-rahmaan,ar-raheem,al-malik,al-quddoos,as-salaam,al-mumin,al-muhaymin,al-azeez,al-jabbaar,al-mutakabbir,al-khaaliq,al-baari,al-musawwir,al-ghaffaar,al-qahhaar,al-wahhaab,ar-razzaaq,al-fattaah,al-aleem,al-qaabid,al-baasit,as-samee,al-baseer,al-hakam,al-lateef,al-khabeer,al-haleem,al-adheem,al-ghafoor,ash-shakoor,al-aliyy,al-kabeer,al-hafeedh,al-muqeet,al-haseeb,al-kareem,ar-raqeeb,al-mujeeb,al-waasi,al-hakeem,al-wadood,al-majeed,ash-shaheed,al-haqq,al-wakeel,al-qawiyy,al-mateen,al-waliyy,al-hameed,al-hayy,al-qayyoom,al-waahid,al-ahad,as-samad,al-qaadir,al-muqtadir,al-muqaddim,al-muakhkhir,al-awwal,al-aakhir,adh-dhaahir,al-baatin,al-mutaali,al-barr,at-tawwaab,al-afuww,ar-raoof,al-ghaniyy,al-waarith,allah,al-alaa,al-akram,al-ilaah,al-haafidh,al-hafiyy,al-mubeen,al-khallaq,ash-shaakir,al-aalim,al-qaahir,al-qadeer,al-qareeb,al-muheet,al-maleek,al-mawlaa,an-naseer,al-jameel,al-jawaad,al-hayiyy,ar-rabb,ar-rafeeq,as-subbooh,as-sayyid,ash-shaafee,at-tayyib,al-muhsin,al-mutee,al-mannaan,al-witr
+REMAINING=allah,al-alaa,al-akram,al-ilaah,al-haafidh,al-hafiyy,al-mubeen,al-khallaq,ash-shaakir,al-aalim,al-qaahir,al-qadeer,al-qareeb,al-muheet,al-maleek,al-mawlaa,an-naseer,al-jameel,al-jawaad,al-hayiyy,ar-rabb,ar-rafeeq,as-subbooh,as-sayyid,ash-shaafee,at-tayyib,al-muhsin,al-mutee,al-mannaan,al-witr

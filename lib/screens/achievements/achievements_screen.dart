@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/achievement_provider.dart';
+import '../../providers/rewards_provider.dart';
 import '../../providers/gamification_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/achievement.dart';
+import '../../models/reward.dart';
 import '../../widgets/gamification/achievement_card.dart';
 import '../../widgets/gamification/streak_display_widget.dart';
 import '../../widgets/gamification/level_badge_widget.dart';
@@ -38,9 +41,9 @@ class _AchievementsScreenState extends State<AchievementsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'الإنجازات والتقدم',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          context.tr('achievementsTitle'),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         bottom: TabBar(
           controller: _tabController,
@@ -73,6 +76,8 @@ class _AchievementsScreenState extends State<AchievementsScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const _OwnedBadges(),
+              const SizedBox(height: 12),
               // Quick Access Buttons
               Row(
                 children: [
@@ -616,5 +621,74 @@ class _AchievementsScreenState extends State<AchievementsScreen>
         ],
       ),
     );
+  }
+}
+
+class _OwnedBadges extends StatelessWidget {
+  const _OwnedBadges();
+
+  @override
+  Widget build(BuildContext context) {
+    final owned = context
+        .watch<RewardsProvider>()
+        .getByType(RewardType.badge)
+        .where((reward) => reward.isUnlocked)
+        .toList();
+    final en = !context.isArabic;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              context.tr('ownedBadges'),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            if (owned.isEmpty)
+              Text(context.tr('noBadges'))
+            else
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final badge in owned)
+                    Chip(
+                      avatar: Icon(_icon(badge.icon), size: 18),
+                      label: Text(en ? _englishTitle(badge.id) : badge.title),
+                    ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  IconData _icon(String name) {
+    switch (name) {
+      case 'military_tech':
+        return Icons.military_tech;
+      case 'auto_awesome':
+        return Icons.auto_awesome;
+      case 'favorite':
+        return Icons.favorite;
+      default:
+        return Icons.emoji_events;
+    }
+  }
+
+  String _englishTitle(String id) {
+    switch (id) {
+      case 'badge_warrior':
+        return 'Prayer warrior';
+      case 'badge_phoenix':
+        return 'Phoenix';
+      case 'badge_saint':
+        return 'Steadfast';
+      default:
+        return id;
+    }
   }
 }

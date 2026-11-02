@@ -23,6 +23,9 @@ class AppTheme {
   static const Color textPrimary = Color(0xFFFFFFFF);
   static const Color textSecondary = Color(0xFFB0B0B0);
   static const Color textArabic = Color(0xFFF5F5F5);
+  static const Color lightBackground = Color(0xFFF6F3EE);
+  static const Color lightSurface = Color(0xFFFFFCF8);
+  static const Color lightInk = Color(0xFF1C2430);
 
   // Custom Typography
   static TextStyle quranArabic = GoogleFonts.amiri(
@@ -32,41 +35,72 @@ class AppTheme {
     fontWeight: FontWeight.w500,
   );
 
-  /// Light Theme (Default)
+  /// Warm light theme that keeps the teal and gold identity.
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
     primaryColor: primaryGreen,
-    scaffoldBackgroundColor: Colors.white,
+    scaffoldBackgroundColor: lightBackground,
     colorScheme: const ColorScheme.light(
       primary: primaryGreen,
       secondary: accentGold,
-      surface: Colors.white,
-      error: Colors.red,
+      surface: lightSurface,
+      error: Color(0xFFB42318),
+      onPrimary: Colors.white,
+      onSurface: lightInk,
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: primaryGreen,
-      foregroundColor: Colors.white,
+      backgroundColor: lightSurface,
+      foregroundColor: lightInk,
       elevation: 0,
       centerTitle: true,
+      surfaceTintColor: Colors.transparent,
     ),
     cardTheme: const CardThemeData(
-      elevation: 2,
+      elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(16)),
       ),
-      color: Colors.white,
+      color: lightSurface,
+      margin: EdgeInsets.zero,
+    ),
+    dialogTheme: const DialogThemeData(
+      backgroundColor: lightSurface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(20)),
+      ),
+    ),
+    bottomSheetTheme: const BottomSheetThemeData(
+      backgroundColor: lightSurface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+    ),
+    navigationBarTheme: NavigationBarThemeData(
+      backgroundColor: lightSurface,
+      indicatorColor: primaryGreen.withValues(alpha: 0.16),
+      labelTextStyle: WidgetStateProperty.resolveWith((states) {
+        final selected = states.contains(WidgetState.selected);
+        return TextStyle(
+          fontSize: 12,
+          fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+          color: selected ? primaryGreen : lightInk.withValues(alpha: 0.7),
+        );
+      }),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: primaryGreen,
         foregroundColor: Colors.white,
+        minimumSize: const Size(48, 48),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
       ),
     ),
+    dividerTheme: DividerThemeData(color: lightInk.withValues(alpha: 0.08)),
+    iconTheme: const IconThemeData(color: lightInk),
   );
 
   /// Default Dark Theme (Ocean)
@@ -76,6 +110,24 @@ class AppTheme {
     background: darkBackground,
     surface: cardBackground,
   );
+
+  /// Light theme tinted by a purchased color theme.
+  static ThemeData lightThemeFor(String? themeId) {
+    if (themeId == null || themeId.isEmpty) return lightTheme;
+    final accent = getThemeById(themeId).colorScheme;
+    return lightTheme.copyWith(
+      primaryColor: accent.primary,
+      colorScheme: ColorScheme.light(
+        primary: accent.primary,
+        secondary: accent.secondary,
+        surface: lightSurface,
+        error: const Color(0xFFB42318),
+        onPrimary: Colors.white,
+        onSurface: lightInk,
+      ),
+      appBarTheme: lightTheme.appBarTheme.copyWith(foregroundColor: lightInk),
+    );
+  }
 
   /// Get Theme by ID
   static ThemeData getThemeById(String? themeId) {
@@ -152,16 +204,42 @@ class AppTheme {
         ),
         color: surface,
       ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: surface,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+        ),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: surface,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: surface,
+        indicatorColor: primary.withValues(alpha: 0.28),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
+          return TextStyle(
+            fontSize: 12,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            color: selected ? secondary : textSecondary,
+          );
+        }),
+      ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primary,
           foregroundColor: textPrimary,
+          minimumSize: const Size(48, 48),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
         ),
       ),
+      dividerTheme: DividerThemeData(color: Colors.white.withValues(alpha: 0.08)),
     );
   }
 

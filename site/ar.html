@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>النور — مواقيت الصلاة والقرآن والأذكار والقبلة في تطبيق واحد يعمل دون اتصال</title>
+<meta name="description" content="تطبيق النور يحسب مواقيت الصلاة على جهازك، ويضم القرآن كاملاً بالرسم العثماني مع التلاوة، والأذكار، وبوصلة القبلة، ومتتبع عبادة خاص. مجاني، بلا حساب، بلا إعلانات، ويعمل دون إنترنت.">
+<meta name="theme-color" content="#1a1a2e">
+<!-- Before publishing: canonical, hreflang, og:url and og:image must be absolute URLs — put the deployed origin in front of each, and in robots.txt + sitemap.xml. -->
+<link rel="canonical" href="/ar.html">
+<link rel="alternate" hreflang="en" href="/">
+<link rel="alternate" hreflang="ar" href="/ar.html">
+<link rel="alternate" hreflang="x-default" href="/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="النور">
+<meta property="og:title" content="النور — عُد إلى صلاتك">
+<meta property="og:description" content="مواقيت صلاة تُحسب على الجهاز، وقرآن كامل بالتلاوة، وأذكار، وقبلة، ومتتبع عبادة خاص. مجاني، يعمل دون اتصال، وبلا حساب.">
+<meta property="og:image" content="assets/og-ar.png">
+<meta property="og:url" content="/ar.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="النور — عُد إلى صلاتك">
+<meta name="twitter:description" content="مواقيت صلاة دقيقة وقرآن وأذكار وقبلة في تطبيق أندرويد واحد مجاني يعمل دون اتصال.">
+<meta name="twitter:image" content="assets/og-ar.png">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+<script>document.documentElement.classList.remove('no-js');</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "AlNoor",
+  "alternateName": "النور",
+  "applicationCategory": "Lifestyle",
+  "operatingSystem": "Android 7.0 or newer",
+  "softwareVersion": "1.0.1",
+  "inLanguage": "ar",
+  "url": "https://github.com/seifjo/Back-to-pray",
+  "downloadUrl": "https://github.com/seifjo/Back-to-pray/releases",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "featureList": [
+    "On-device prayer time calculation",
+    "Full Qur'an in Uthmani script with offline audio",
+    "Adhkar and dua libraries",
+    "Qibla compass",
+    "Worship tracker",
+    "Spiritual journeys",
+    "Quran Race",
+    "Achievements and streaks",
+    "Hadith library",
+    "Names of Allah",
+    "Hijri calendar",
+    "Nasheed library",
+    "Bilingual English and Arabic with RTL"
+  ]
+}
+</script>
+</head>
+<body>
+
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+<defs>
+<g id="i-clock"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3.4 2"/></g>
+<g id="i-book"><path d="M12 6.5C10 5 7.6 4.5 5 4.5v13c2.6 0 5 .5 7 2 2-1.5 4.4-2 7-2v-13c-2.6 0-5 .5-7 2z"/><path d="M12 6.5v14"/></g>
+<g id="i-list"><path d="M5 7h14M5 12h10M5 17h12"/></g>
+<g id="i-compass"><circle cx="12" cy="12" r="9"/><path d="M15.8 8.2l-2.3 5.3-5.3 2.3 2.3-5.3z"/></g>
+<g id="i-apps"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></g>
+<g id="i-fingerprint"><path d="M6.6 10.2a6 6 0 0 1 10.8 1.4"/><path d="M9 14.4a3 3 0 0 1 6-.4c.2 2-.3 3.8-1.2 5.4"/><path d="M12 11.2a3.2 3.2 0 0 1 3.2 3.2"/><path d="M7.8 17.4c.6-1.4.8-2.8.6-4.2"/></g>
+<g id="i-heart"><path d="M12 20s-7-4.3-7-9a3.9 3.9 0 0 1 7-2.4A3.9 3.9 0 0 1 19 11c0 4.7-7 9-7 9z"/></g>
+<g id="i-check"><rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M8.6 12.4l2.4 2.4 4.6-5"/></g>
+<g id="i-route"><circle cx="7" cy="18" r="2.4"/><circle cx="17" cy="6" r="2.4"/><path d="M14.6 6.6H10a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6H9.4"/></g>
+<g id="i-users"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.4 20a5.6 5.6 0 0 1 11.2 0"/><path d="M16.4 6.2a3 3 0 0 1 0 5.6M17.6 14.2A5.2 5.2 0 0 1 20.8 20"/></g>
+<g id="i-trophy"><path d="M8 4.5h8v4.2a4 4 0 0 1-8 0z"/><path d="M8 6.2H5.2v1.2A3 3 0 0 0 8 10.4M16 6.2h2.8v1.2a3 3 0 0 1-2.8 3"/><path d="M12 12.8v3.6M9 20h6"/></g>
+<g id="i-scroll"><rect x="5" y="4.5" width="14" height="15" rx="2.5"/><path d="M8.6 9h6.8M8.6 12.6h6.8M8.6 16.2h4"/></g>
+<g id="i-sparkle"><path d="M12 4l2.2 5.3L19.5 11.5l-5.3 2.2L12 19l-2.2-5.3L4.5 11.5l5.3-2.2z"/></g>
+<g id="i-quiz"><circle cx="12" cy="12" r="8.6"/><path d="M9.6 9.6a2.5 2.5 0 0 1 4.6 1.4c0 1.7-2.1 1.9-2.1 3.5"/><circle cx="12" cy="17.4" r=".7" fill="currentColor" stroke="none"/></g>
+<g id="i-calendar"><rect x="4" y="5.2" width="16" height="14.6" rx="2.6"/><path d="M4 10h16M8.8 3.2v3.6M15.2 3.2v3.6"/></g>
+<g id="i-bookmark"><path d="M7 4.2h10V20l-5-3.8L7 20z"/></g>
+<g id="i-music"><circle cx="7" cy="17.6" r="2.4"/><circle cx="17" cy="15.6" r="2.4"/><path d="M9.4 17.6V7l10-2v10.6"/></g>
+<g id="i-download"><path d="M12 4v10M8.2 10.6L12 14.4l3.8-3.8M5 19.4h14"/></g>
+<g id="i-lock"><rect x="5" y="10.2" width="14" height="9.6" rx="2.6"/><path d="M8.2 10.2V7.4a3.8 3.8 0 0 1 7.6 0v2.8"/></g>
+<g id="i-globe"><circle cx="12" cy="12" r="8.8"/><path d="M3.4 12h17.2M12 3.2c2.4 2.6 2.4 15 0 17.6M12 3.2c-2.4 2.6-2.4 15 0 17.6"/></g>
+<g id="i-phone"><rect x="7" y="3" width="10" height="18" rx="2.6"/><path d="M10.8 18h2.4"/></g>
+<g id="i-github"><path d="M9.2 19.6c-3.8 1.2-3.8-2-5.4-2.4M14.8 21v-3.4c0-1 .3-1.7.9-2.2 2.7-.3 5.2-1.6 5.2-5.6a4.4 4.4 0 0 0-1.2-3 4.2 4.2 0 0 0-.1-3.1s-1-.3-3.2 1.2a11 11 0 0 0-5.7 0C7.6 3.3 6.6 3.6 6.6 3.6a4.2 4.2 0 0 0-.1 3.1 4.4 4.4 0 0 0-1.2 3.1c0 3.9 2.5 5.2 5.2 5.5-.5.5-.9 1.2-.9 2.2V21"/></g>
+<g id="i-settings"><circle cx="12" cy="12" r="2.8"/><path d="M12 3.4V6M12 18v2.6M3.4 12H6M18 12h2.6M5.9 5.9 7.7 7.7M16.3 16.3l1.8 1.8M18.1 5.9l-1.8 1.8M7.7 16.3l-1.8 1.8"/></g>
+<g id="i-calc"><rect x="6" y="3" width="12" height="18" rx="2.4"/><path d="M9 7.2h6M9.2 12h1.8M14 12h1M9.2 16.4h1.8M14 16.4h1"/></g>
+<g id="i-refresh"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20.4 4.4v4.2h-4.2"/></g>
+<g id="i-headphones"><path d="M5 15.4V11a7 7 0 0 1 14 0v4.4"/><rect x="2.8" y="14" width="4.4" height="6.4" rx="2.2"/><rect x="16.8" y="14" width="4.4" height="6.4" rx="2.2"/></g>
+<g id="i-play"><path d="M8.4 5.4l10.2 6.6-10.2 6.6z" fill="currentColor" stroke="none"/></g>
+<g id="i-pause"><path d="M9.4 5.6v12.8M14.6 5.6v12.8"/></g>
+<g id="i-stop"><rect x="6.4" y="6.4" width="11.2" height="11.2" rx="2.4"/></g>
+<g id="i-mosque"><path d="M12 3.4c1.8 1.9 2.8 3.1 2.8 4.5a2.8 2.8 0 0 1-5.6 0c0-1.4 1-2.6 2.8-4.5z"/><path d="M5.4 20.4v-5.6a3 3 0 0 1 3-3h7.2a3 3 0 0 1 3 3v5.6"/><path d="M3 20.4h18"/></g>
+<g id="i-edit"><path d="M5 19h4l9.4-9.4-4-4L5 15z"/><path d="M14.6 4.6l4 4"/></g>
+<g id="i-locate"><circle cx="12" cy="12" r="3"/><path d="M12 3v3.2M12 17.8V21M3 12h3.2M17.8 12H21"/></g>
+<g id="i-insights"><path d="M4 20h16"/><path d="M7 20v-6M12 20V8M17 20v-9"/></g>
+<g id="i-fajr"><path d="M12 5.4V8M5.6 11.4H8M16 11.4h2.4M7.6 7.4 9.2 9M16.4 7.4 14.8 9"/><path d="M8.8 15a3.2 3.2 0 0 1 6.4 0"/><path d="M3.6 19h16.8"/></g>
+<g id="i-sunrise"><path d="M12 4.6v2.8M4.8 12.6H7M17 12.6h2.2M7.2 8.6 8.8 10.2M16.8 8.6l-1.6 1.6"/><path d="M8.6 15.4a3.4 3.4 0 0 1 6.8 0"/><path d="M3.4 19.4h17.2"/></g>
+<g id="i-dhuhr"><circle cx="12" cy="12" r="3.6"/><path d="M12 3.6V6M12 18v2.4M3.6 12H6M18 12h2.4M6 6l1.7 1.7M16.3 16.3 18 18M18 6l-1.7 1.7M7.7 16.3 6 18"/></g>
+<g id="i-asr"><path d="M7.4 18.4a3.8 3.8 0 0 1 .4-7.6 5 5 0 0 1 9.4 1.2 3.3 3.3 0 0 1-.6 6.4z"/></g>
+<g id="i-maghrib"><path d="M16.8 3.6a6.6 6.6 0 1 0 4.4 9.6 7 7 0 0 1-4.4-9.6z"/><path d="M5 5.6l.6 1.5 1.5.6-1.5.6L5 9.8l-.6-1.5L2.9 7.7l1.5-.6z"/></g>
+<g id="i-isha"><path d="M17.4 13.8A6.2 6.2 0 0 1 9.8 6.2a6.2 6.2 0 1 0 7.6 7.6z"/><path d="M18.4 3.8l.5 1.4 1.4.5-1.4.5-.5 1.4-.5-1.4-1.4-.5 1.4-.5z"/></g>
+</defs>
+</svg>
+
+<a class="skip" href="#main">تخطَّ إلى المحتوى</a>
+
+<header class="header" id="top">
+  <div class="wrap header__inner">
+    <a class="brand" href="#top" aria-label="النور — الصفحة الرئيسية">
+      <svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true">
+        <rect width="64" height="64" rx="16" fill="#071A3A"/>
+        <path d="M32 12l4.6 11.2L48 27l-11.4 3.8L32 42l-4.6-11.2L16 27l11.4-3.8z" fill="#14FFEC" opacity=".9"/>
+        <circle cx="32" cy="27" r="4.2" fill="#D4AF37"/>
+        <path d="M20 50h24" stroke="#0D7377" stroke-width="3.4" stroke-linecap="round"/>
+      </svg>
+      <span class="brand__text">
+        <span class="brand__ar">النور</span>
+        <span class="brand__la">AlNoor</span>
+      </span>
+    </a>
+    <nav class="nav" aria-label="أقسام الصفحة">
+      <a class="nav__link" href="#features">المزايا</a>
+      <a class="nav__link" href="#screens">الشاشات</a>
+      <a class="nav__link" href="#privacy">الخصوصية</a>
+      <a class="nav__link" href="#faq">الأسئلة</a>
+    </nav>
+    <div class="nav">
+      <a class="lang-toggle" href="index.html" hreflang="en" lang="en" title="English version">English</a>
+      <a class="btn" href="https://github.com/seifjo/Back-to-pray/releases" rel="noopener">حمّل التطبيق</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="hero">
+    <div class="wrap hero__inner">
+      <div>
+        <p class="eyebrow">الصلاة · القرآن · الأذكار · القبلة</p>
+        <h1>عُد إلى صلاتك — <em>دون أن تفارق هاتفك.</em></h1>
+        <p class="hero__sub">النور يجمع مواقيت الصلاة الدقيقة، والقرآن كاملاً بالتلاوة، والأذكار، ومتتبع عبادة خاص — في تطبيق واحد يعمل دون اتصال، ولا يطلب منك التسجيل أبداً.</p>
+        <div class="hero__cta">
+          <a class="btn btn--lg" href="https://github.com/seifjo/Back-to-pray/releases" rel="noopener">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-download"/></svg>
+            نزّل لأندرويد <span class="btn__os">v1.0.1</span>
+          </a>
+          <a class="btn btn--lg btn--ghost" href="#features">استكشف المزايا</a>
+        </div>
+        <ul class="hero__facts">
+          <li>مجاني دائماً</li>
+          <li>بلا حساب</li>
+          <li>بلا إعلانات</li>
+          <li>يعمل دون اتصال</li>
+          <li>أندرويد <bdi>7.0+</bdi></li>
+        </ul>
+      </div>
+
+      <div class="hero__device">
+        <div class="device device--tilt" aria-hidden="true">
+          <div class="device__frame">
+            <div class="screen">
+              <div class="screen__notch"></div>
+              <div class="screen__bar">
+                <strong>مواعيد الصلاة</strong>
+                <span class="screen__actions">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-settings"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-calc"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-refresh"/></svg>
+                </span>
+              </div>
+              <div class="screen__body">
+                <div class="pt-hero" style="--hc:#2b7f78">
+                  <p class="pt-hero__label">الصلاة القادمة</p>
+                  <p class="pt-hero__name">العشاء</p>
+                  <div class="pt-count">
+                    <span class="pt-count__unit"><b>01</b><span>ساعة</span></span><i>:</i>
+                    <span class="pt-count__unit"><b>23</b><span>دقيقة</span></span><i>:</i>
+                    <span class="pt-count__unit"><b>47</b><span>ثانية</span></span>
+                  </div>
+                  <p class="pt-hero__time">8:05 م</p>
+                </div>
+                <div class="pt-seg"><span class="on">12 ساعة</span><span>24 ساعة</span></div>
+                <div class="pt-rows">
+                  <div class="pt-row" data-prayer="fajr"><span class="pt-row__chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-fajr"/></svg></span><span class="pt-row__name">الفجر</span><span class="pt-row__time">5:12 ص</span></div>
+                  <div class="pt-row" data-prayer="sunrise"><span class="pt-row__chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-sunrise"/></svg></span><span class="pt-row__name">الشروق</span><span class="pt-row__time">6:38 ص</span></div>
+                  <div class="pt-row" data-prayer="dhuhr"><span class="pt-row__chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-dhuhr"/></svg></span><span class="pt-row__name">الظهر</span><span class="pt-row__time">12:20 م</span></div>
+                  <div class="pt-row" data-prayer="asr"><span class="pt-row__chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-asr"/></svg></span><span class="pt-row__name">العصر</span><span class="pt-row__time">3:45 م</span></div>
+                  <div class="pt-row" data-prayer="maghrib"><span class="pt-row__chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-maghrib"/></svg></span><span class="pt-row__name">المغرب</span><span class="pt-row__time">6:42 م</span></div>
+                  <div class="pt-row is-next" data-prayer="isha"><span class="pt-row__chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-isha"/></svg></span><span class="pt-row__name">العشاء</span><span class="pt-row__time">8:05 م<span class="pt-row__next">القادمة</span></span></div>
+                </div>
+              </div>
+              <div class="screen__nav">
+                <span class="is-active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-clock"/></svg>الصلاة</span>
+                <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-book"/></svg>القرآن</span>
+                <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-list"/></svg>الأذكار</span>
+                <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-compass"/></svg>القبلة</span>
+                <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-apps"/></svg>المزيد</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--first">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">خمس مرات في اليوم</p>
+        <h2>الشاشات الأربع التي ستعيش معها</h2>
+        <p class="lede">بقيةُ التطبيق زيادة على هذا. هذه التبويبات في أسفل الشاشة، ومصممة لتفتحها بسرعة تجعلك لا تفكر فيها.</p>
+      </div>
+      <div class="grid-core">
+        <article class="tile reveal">
+          <span class="tile__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-clock"/></svg></span>
+          <h3 class="tile__title">أوقات الصلاة<span class="tile__en">Prayer times</span></h3>
+          <p>تُحسب على جهازك مباشرة بمحرك adhan من إحداثياتك. ستة صفوف من الفجر إلى العشاء، وعدّاد حي للصلاة القادمة، وخطة تنبيهات تضبطها بنفسك.</p>
+        </article>
+        <article class="tile reveal">
+          <span class="tile__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-book"/></svg></span>
+          <h3 class="tile__title">القرآن الكريم<span class="tile__en">Qur'an</span></h3>
+          <p>سورٌ أربع ومئة وأربع عشرة بالرسم العثماني، محفوظة داخل التطبيق فتجد النص بلا شبكة. استمع لأكثر من عشرة قرّاء، أو نزّل السورة وأكمل الاستماع في الطائرة.</p>
+        </article>
+        <article class="tile reveal">
+          <span class="tile__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-list"/></svg></span>
+          <h3 class="tile__title">الأذكار<span class="tile__en">Adhkar</span></h3>
+          <p>أذكار الصباح والمساء واليوم بعدّادات تضغطها تباعاً. والعربية بحجم مريح للقراءة لا للتضبيب.</p>
+        </article>
+        <article class="tile reveal">
+          <span class="tile__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-compass"/></svg></span>
+          <h3 class="tile__title">القبلة<span class="tile__en">Qibla</span></h3>
+          <p>بوصلة حيّة مع سمت القبلة، واتجاهك الحالي، والفرق بينهما، ودقة المستشعر مكتوبة بالأرقام — مع تحديد الموقع يدوياً حين تختلف المستشعرات.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">ما في التطبيق</p>
+        <h2>أربع عشرة ميزة، مجمّعة كما يجمعها التطبيق نفسه</h2>
+        <p class="lede">هذه الأسماء والأوصاف هي نصّها داخل التطبيق، فلا يعد شيءٌ هنا بشاشة لن تجدها تحت «المزيد».</p>
+      </div>
+
+      <div class="group">
+        <div class="group__title"><h3>العبادة</h3><span class="group__count">7 مزايا</span></div>
+        <div class="grid-features">
+          <article class="feature reveal">
+            <span class="feature__dot" style="--fc:#0d7377"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-list"/></svg></span>
+            <div><h4>الأذكار</h4><p>أذكار الصباح والمساء واليوم.</p></div>
+          </article>
+          <article class="feature reveal">
+            <span class="feature__dot" style="--fc:#d4af37"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-fingerprint"/></svg></span>
+            <div><h4>التسبيح الرقمي</h4><p>عدّ تسبيحك بعدّاد هادئ.</p></div>
+          </article>
+          <article class="feature reveal">
+            <span class="feature__dot" style="--fc:#5b8c5a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-heart"/></svg></span>
+            <div><h4>مكتبة الأدعية</h4><p>أدعية لمواقف الحياة اليومية.</p></div>
+          </article>
+          <article class="feature reveal">
+            <span class="feature__dot" style="--fc:#6b5b95"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-check"/></svg></span>
+            <div><h4>متتبع العبادة</h4><p>قائمة يومية خاصة لأهداف تختارها بنفسك.</p></div>
+          </article>
+          <article class="feature reveal">
+            <span class="feature__dot" style="--fc:#45b8ac"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-route"/></svg></span>
+            <div><h4>الرحلات الإسلامية</h4><p>رحلات روحية وتعافٍ بإرشاد منظم.</p></div>
+          </article>
+          <article class="feature reveal">
+            <span class="feature__dot" style="--fc:#0d7377"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-users"/></svg></span>
+            <div><h4>سباق القرآن</h4><p>انضم إلى سباق ختم القرآن مع الأصدقاء.</p></div>
+          </article>
+          <article class="feature reveal">
+            <span class="feature__dot" style="--fc:#d4af37"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-trophy"/></svg></span>
+            <div><h4>الإنجازات</h4><p>تابع الأوسمة والإنجازات الشخصية.</p></div>
+          </article>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group__title"><h3>المعرفة</h3><span class="group__count">4 مزايا</span></div>
+        <div class="grid-features">
+          <article class="feature reveal">
+            <span class="feature__dot" style="--fc:#8b6f47"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-scroll"/></svg></span>
+            <div><h4>مكتبة الحديث</h4><p>اطّلع على روايات موثوقة بعناية.</p></div>
+          </article>
+          <article class="feature reveal">
+            <span class="feature__dot" style="--fc:#c9a227"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-sparkle"/></svg></span>
+            <div><h4>أسماء الله الحسنى</h4><p>تعرّف على الأسماء الحسنى وتدبّرها.</p></div>
+          </article>
+          <article class="feature reveal">
+            <span class="feature__dot" style="--fc:#3d7ea6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-quiz"/></svg></span>
+            <div><h4>اختبار إسلامي</h4><p>اختبر معرفتك الإسلامية ونمّها.</p></div>
+          </article>
+          <article class="feature reveal">
+            <span class="feature__dot" style="--fc:#0d7377"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-music"/></svg></span>
+            <div><h4>مكتبة الأناشيد</h4><p>ستة عشر نشيداً مرفقة داخل التطبيق، فتُشغَّل بلا أي اتصال.</p></div>
+          </article>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group__title"><h3>الأدوات</h3><span class="group__count">3 مزايا</span></div>
+        <div class="grid-features">
+          <article class="feature reveal">
+            <span class="feature__dot" style="--fc:#0d7377"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-calendar"/></svg></span>
+            <div><h4>التقويم الهجري</h4><p>تابع التواريخ الإسلامية والأيام المهمة.</p></div>
+          </article>
+          <article class="feature reveal">
+            <span class="feature__dot" style="--fc:#b42318"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-bookmark"/></svg></span>
+            <div><h4>المحفوظات</h4><p>اجمع الآيات والأدعية والملاحظات في مكان واحد.</p></div>
+          </article>
+          <article class="feature reveal">
+            <span class="feature__dot" style="--fc:#14a3a8"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-compass"/></svg></span>
+            <div><h4>القبلة</h4><p>اعرف اتجاه الكعبة المشرفة.</p></div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="screens">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">الشاشات</p>
+        <h2>داكنٌ افتراضاً، عربيٌّ أولاً</h2>
+        <p class="lede">مبنية من الشاشات الحقيقية: ألوان الصلوات نفسها، وحلقة البوصلة نفسها، وبطاقة السلسلة نفسها. اسحب أفقياً على الهاتف.</p>
+      </div>
+
+      <div class="gallery" tabindex="0" role="group" aria-label="شاشات التطبيق">
+
+        <figure class="shot">
+          <div class="device" aria-hidden="true"><div class="device__frame"><div class="screen">
+            <div class="screen__notch"></div>
+            <div class="screen__bar"><strong>مواعيد الصلاة</strong><span class="screen__actions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-settings"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-calc"/></svg></span></div>
+            <div class="screen__body">
+              <div class="pt-hero" style="--hc:#6b5b95">
+                <p class="pt-hero__label">الصلاة القادمة</p>
+                <p class="pt-hero__name">الفجر</p>
+                <div class="pt-count"><span class="pt-count__unit"><b>03</b><span>ساعة</span></span><i>:</i><span class="pt-count__unit"><b>41</b><span>دقيقة</span></span><i>:</i><span class="pt-count__unit"><b>09</b><span>ثانية</span></span></div>
+                <p class="pt-hero__time">5:12 ص</p>
+              </div>
+              <div class="pt-rows">
+                <div class="pt-row is-next" data-prayer="fajr"><span class="pt-row__chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-fajr"/></svg></span><span class="pt-row__name">الفجر</span><span class="pt-row__time">5:12 ص<span class="pt-row__next">القادمة</span></span></div>
+                <div class="pt-row" data-prayer="sunrise"><span class="pt-row__chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-sunrise"/></svg></span><span class="pt-row__name">الشروق</span><span class="pt-row__time">6:38 ص</span></div>
+                <div class="pt-row" data-prayer="dhuhr"><span class="pt-row__chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-dhuhr"/></svg></span><span class="pt-row__name">الظهر</span><span class="pt-row__time">12:20 م</span></div>
+                <div class="pt-row" data-prayer="asr"><span class="pt-row__chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-asr"/></svg></span><span class="pt-row__name">العصر</span><span class="pt-row__time">3:45 م</span></div>
+                <div class="pt-row" data-prayer="maghrib"><span class="pt-row__chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-maghrib"/></svg></span><span class="pt-row__name">المغرب</span><span class="pt-row__time">6:42 م</span></div>
+              </div>
+            </div>
+            <div class="screen__nav"><span class="is-active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-clock"/></svg>الصلاة</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-book"/></svg>القرآن</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-list"/></svg>الأذكار</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-compass"/></svg>القبلة</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-apps"/></svg>المزيد</span></div>
+          </div></div></div>
+          <figcaption>
+            <h4>أوقات الصلاة</h4>
+            <p>كل صفّ بلون صلاته، والصلاة القادمة بإطار مميّز، مع عدّاد حيّ في البطاقة العليا.</p>
+          </figcaption>
+        </figure>
+
+        <figure class="shot">
+          <div class="device" aria-hidden="true"><div class="device__frame"><div class="screen">
+            <div class="screen__notch"></div>
+            <div class="screen__bar"><strong>سورة الملك</strong><span class="screen__actions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-download"/></svg></span></div>
+            <div class="qr-strip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-headphones"/></svg>
+              <span>يُشغَّل: سورة الملك</span>
+              <svg class="qr-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-pause"/></svg>
+              <svg class="qr-stop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-stop"/></svg>
+            </div>
+            <div class="screen__body">
+              <div class="ayah">
+                <div class="ayah__head"><span class="ayah__tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-bookmark"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-play"/></svg></span><span class="ayah__pill">الآية 1</span></div>
+                <p class="ayah__text">تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ</p>
+              </div>
+              <div class="ayah is-saved">
+                <div class="ayah__head"><span class="ayah__tools"><svg class="gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-bookmark"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-play"/></svg></span><span class="ayah__pill">الآية 2</span></div>
+                <p class="ayah__text">الَّذِي خَلَقَ الْمَوْتَ وَالْحَيَاةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًا</p>
+              </div>
+              <div class="ayah">
+                <div class="ayah__head"><span class="ayah__tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-bookmark"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-play"/></svg></span><span class="ayah__pill">الآية 3</span></div>
+                <p class="ayah__text">الَّذِي خَلَقَ سَبْعَ سَمَاوَاتٍ طِبَاقًا مَّا تَرَىٰ فِي خَلْقِ الرَّحْمَٰنِ مِن تَفَاوُتٍ</p>
+              </div>
+            </div>
+            <div class="screen__nav"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-clock"/></svg>الصلاة</span><span class="is-active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-book"/></svg>القرآن</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-list"/></svg>الأذكار</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-compass"/></svg>القبلة</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-apps"/></svg>المزيد</span></div>
+          </div></div></div>
+          <figcaption>
+            <h4>قارئ القرآن</h4>
+            <p>رسم عثماني بخط أميري، ورقم الآية في دائرة ذهبية، وشريط تلاوة يثبت وأنت تمرّر. القارئ يعرض العربية، مع حفظ الآية وتشغيلها صوتياً.</p>
+          </figcaption>
+        </figure>
+
+        <figure class="shot">
+          <div class="device" aria-hidden="true"><div class="device__frame"><div class="screen">
+            <div class="screen__notch"></div>
+            <div class="screen__bar"><strong>القبلة</strong><span class="screen__actions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-locate"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-refresh"/></svg></span></div>
+            <div class="screen__body qb-body">
+              <div class="dial is-aligned">
+                <span class="dial__ticks"></span>
+                <span class="dial__needle"></span>
+                <span class="dial__hub"></span>
+                <span class="dial__kaaba"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-mosque"/></svg></span>
+              </div>
+              <p class="qb-status">أنت باتجاه القبلة</p>
+              <div class="qb-stats">
+                <div><span>سمت القبلة</span><b>118.4°</b></div>
+                <div><span>الاتجاه الحالي</span><b>116.9°</b></div>
+                <div><span>الفرق</span><b>1.5°</b></div>
+                <div><span>الدقة</span><b>±4.0°</b></div>
+              </div>
+              <p class="qb-hint">دقة المستشعر تتفاوت — أمسك الهاتف أفقياً بعيداً عن المعدن.</p>
+            </div>
+            <div class="screen__nav"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-clock"/></svg>الصلاة</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-book"/></svg>القرآن</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-list"/></svg>الأذكار</span><span class="is-active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-compass"/></svg>القبلة</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-apps"/></svg>المزيد</span></div>
+          </div></div></div>
+          <figcaption>
+            <h4>بوصلة القبلة</h4>
+            <p>تصير الحلقة خضراء حين تستقيم، وتبقى الأرقام صادقة: السمت، والاتجاه، والفرق، والدقة بمنزلة عشرية واحدة.</p>
+          </figcaption>
+        </figure>
+
+        <figure class="shot">
+          <div class="device" aria-hidden="true"><div class="device__frame"><div class="screen">
+            <div class="screen__notch"></div>
+            <div class="screen__bar"><strong>الإنجازات</strong><span class="screen__actions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-insights"/></svg></span></div>
+            <div class="screen__body ach">
+              <div class="streak">
+                <div class="streak__head">🔥 <span>سلسلة الالتزام</span></div>
+                <p class="streak__num">64</p>
+                <p class="streak__days">أيام متتالية</p>
+                <div class="streak__bar"><i></i></div>
+                <div class="streak__meta"><span>التالي: 90 يوم</span><span>64%</span></div>
+                <div class="streak__meta"><span>أطول سلسلة: 81 يوم</span></div>
+              </div>
+              <div class="level">
+                <span class="level__ring"><span class="level__emoji">⚔️</span></span>
+                <div>
+                  <p class="level__name">مقاتل</p>
+                  <p class="level__sub">المستوى 4</p>
+                  <div class="level__xp"><i></i></div>
+                  <p class="level__xpnum"><bdi>1 240 / 2 000</bdi> XP</p>
+                </div>
+              </div>
+              <div class="badges">
+                <div class="badge badge--rare"><span class="badge__orb">⭐</span><p class="badge__name">مواظب الفجر</p><span class="badge__xp">+120 XP</span></div>
+                <div class="badge badge--legendary"><span class="badge__orb">🏆</span><p class="badge__name">ختم القرآن</p><span class="badge__xp">+500 XP</span></div>
+              </div>
+            </div>
+            <div class="screen__nav"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-clock"/></svg>الصلاة</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-book"/></svg>القرآن</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-list"/></svg>الأذكار</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-compass"/></svg>القبلة</span><span class="is-active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-apps"/></svg>المزيد</span></div>
+          </div></div></div>
+          <figcaption>
+            <h4>الإنجازات</h4>
+            <p>سلسلة، وحلقة مستوى، وأوسمة تلمع حسب ندرتها — وهو الجزء الذي يبقي الناس عائدين بعد الأسبوع الأول.</p>
+          </figcaption>
+        </figure>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="craft">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">الصناعة</p>
+        <h2>التفاصيل التي يلاحظها المسلم</h2>
+      </div>
+      <div class="grid-craft">
+        <div class="craft reveal">
+          <h3>عربية تُقرأ كما ينبغي</h3>
+          <p>اتجاه حقيقي من اليمين لليسار، وخط أميري القرآني — الوجه نفسه الذي يحمله التطبيق — مع التحكم في حجم الخط من 20 إلى 40 بكسل، لأن العربية تحتاج المساحة.</p>
+        </div>
+        <div class="craft reveal">
+          <h3>سبع حالات للمظهر</h3>
+          <p>ستة ثيمات داكنة وثيم فاتح. تفتحها بنقاط الخبرة التي تجمعها عبادتك، لا بالمال؛ وتتلوّن بها كل الشاشات، حتى أيقونات التنبيهات.</p>
+        </div>
+        <div class="craft reveal">
+          <h3>هجري يطابق بلدتك</h3>
+          <p>ضبط مدمج للمناطق التي يسبق فيها التقويم يوماً أو يتأخر، فيتزامن رمضان وأيام الصيام مع الإعلان المحلي عندكم.</p>
+        </div>
+        <div class="craft reveal">
+          <h3>خاص بطبيعته</h3>
+          <p>متتبع العبادة يفرّق بين الفريضة والهدف الشخصي في سطرين، وبياناته تبقى على جهازك مع كل شيء آخر.</p>
+        </div>
+      </div>
+      <div class="themes" role="list" aria-label="ثيمات التطبيق">
+        <span class="swatch swatch--active" role="listitem"><i style="background:linear-gradient(90deg,#0d7377 50%,#1a1a2e 50%)"></i>محيط</span>
+        <span class="swatch" role="listitem"><i style="background:linear-gradient(90deg,#d9534f 50%,#2c0e0e 50%)"></i>غروب</span>
+        <span class="swatch" role="listitem"><i style="background:linear-gradient(90deg,#2e7d32 50%,#1b3a1b 50%)"></i>غابة</span>
+        <span class="swatch" role="listitem"><i style="background:linear-gradient(90deg,#6a1b9a 50%,#1f0b2e 50%)"></i>بنفسج</span>
+        <span class="swatch" role="listitem"><i style="background:linear-gradient(90deg,#ffa000 50%,#2e2205 50%)"></i>ذهب</span>
+        <span class="swatch" role="listitem"><i style="background:linear-gradient(90deg,#3f51b5 50%,#0f1229 50%)"></i>ضوء القمر</span>
+        <span class="swatch" role="listitem"><i style="background:linear-gradient(90deg,#0d7377 50%,#f6f3ee 50%)"></i>فاتح</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="privacy">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">خصوصية بلا مبالغة</p>
+        <h2>ما يبقى على جهازك، وما يعبر الشبكة</h2>
+        <p class="lede">هذا الجدول مقروء من الشيفرة المصدرية نفسها، لا مكتوبٌ بنوايا تسويقية. إن كان شيءٌ يرسل بيانات فهو مذكور هنا.</p>
+      </div>
+      <div class="grid-privacy">
+        <div class="pcard pcard--local">
+          <h3><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-lock"/></svg> يبقى على جهازك</h3>
+          <ul>
+            <li><strong>مواقيت الصلاة</strong> — تُحسب محلياً بمكتبة <code>adhan</code> من إحداثياتك.</li>
+            <li><strong>سمت القبلة</strong> — حساب على الجهاز مع مستشعراته، بلا استعلام إلى خادم.</li>
+            <li><strong>نص القرآن كاملاً</strong> — مرفق داخل التطبيق كملف بالرسم العثماني.</li>
+            <li><strong>الأناشيد</strong> — كل مقطع يُشغَّل مرفق داخل التطبيق في مكتبة الأناشيد، فلا يُبثّ أي منها عبر الشبكة.</li>
+            <li><strong>موقعك</strong> — يُقرأ على الجهاز لحساب المواقيت والقبلة وجدولة التنبيهات، ولا يُرسل إلى أي مكان.</li>
+            <li><strong>تقدّمك</strong> — عدّادات الأذكار والأهداف والسلاسل والأوسمة والملاحظات والفواصل في تخزين محلي.</li>
+          </ul>
+        </div>
+        <div class="pcard pcard--net">
+          <h3><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-globe"/></svg> يعبر الشبكة</h3>
+          <ul>
+            <li><strong>صوت التلاوة</strong> — ملفات السور تُبث أو تُنزَّل من <code>cdn.mp3quran.net</code> و<code>cdn.islamic.network</code>، وقائمة القرّاء تُجلب من <code>mp3quran.net</code>.</li>
+            <li><strong>مجموعات حديث إضافية</strong> — النواة الموثّقة مرفقة داخل التطبيق، أما المجموعات الاختيارية فتُجلب من <code>cdn.jsdelivr.net</code> (واجهة hadith-api المفتوحة) ثم تُخزَّن على جهازك.</li>
+            <li><strong>غرف سباق القرآن</strong> — حالة الغرف الحيّة عبر Firebase Realtime Database تحت معرّف مجهّل ينشئه التطبيق عند الإقلاع؛ وهو المعرّف الوحيد الذي يحمله التطبيق، ولا يحمل اسماً ولا بريداً ولا رقماً.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="eyebrow" style="margin-block-end:12px">غير موجود أصلاً</p>
+      <ul class="none-list">
+        <li>إعلانات</li>
+        <li>أدوات تحليل</li>
+        <li>تقارير أعطال</li>
+        <li>حساب</li>
+        <li>بريد إلكتروني</li>
+        <li>كلمة مرور</li>
+        <li>رقم هاتف</li>
+      </ul>
+      <p class="privacy-note">لا يوجد في البناء أي SDK للإعلانات أو التحليل أو الأعطال، ولا يوجد أصلاً ما تسجّل به. ولأن التطبيق لا يملك خادماً خاصاً به، فهو لا يستطيع قراءة سجل صلاتك أو ملاحظاتك أو موقعك؛ لا تغادر هذه البيانات جهازك إلا إذا استخدمتَ بنفسك ميزة تصدير البيانات المدمجة.</p>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">أسئلة</p>
+        <h2>قبل أن ثبّته</h2>
+      </div>
+      <div class="faq">
+        <details>
+          <summary>لماذا ملف APK وليس متجر Google Play؟</summary>
+          <p>التطبيق يُوزَّع حالياً مباشرة من مستودعه، فتحمل النور من صفحة الإصدارات على GitHub وتحدّثه بالطريقة نفسها. لا شيء يقف بينك وبين بناء جديد، ولا حساب متجر مرتبط باستخدامك.</p>
+        </details>
+        <details>
+          <summary>هل هو مجاني فعلاً؟</summary>
+          <p>نعم. لا اشتراك، ولا شراء داخل التطبيق، ولا إعلانات تموّله. كل ميزة في هذه الصفحة مشمولة بالتنزيل، والثيمات والشارات التي تفتحها ثمنها نقاط خبرة تجمعها بصلاةك، لا بالمال.</p>
+        </details>
+        <details>
+          <summary>ما الذي يعمل دون اتصال؟</summary>
+          <p>المواقيت، ونص القرآن بالكامل، واتجاه القبلة، والأذكار، والتسبيح، والتقويم الهجري، ومكتبة الأناشيد، ومحفوظاتك وتقدّمك — كلها تعمل بلا شبكة إطلاقاً. صوت التلاوة يحتاج اتصالاً أول مرة، مع إمكانية تنزيل السورة للاستماع دون اتصال. ونواة أحاديث المرفقة تعمل دون اتصال أيضاً؛ لا تحتاج المجموعات الإضافية من الشبكة إلا عند جلبها.</p>
+        </details>
+        <details>
+          <summary>أي إصدار أندرويد أحتاج؟</summary>
+          <p>أندرويد 7.0 (Nougat، API 24) أو أحدث. التخطيط يعمل على الهاتف واللوح معاً.</p>
+        </details>
+        <details>
+          <summary>كيف أحصل على التحديثات؟</summary>
+          <p>البناءات الجديدة تنزل على صفحة الإصدارات نفسها. وتركيب نسخة أحدث فوق القديمة يحفظ تقدّمك، لأن كل شيء مخزَّن على جهازك لا على خادم.</p>
+        </details>
+        <details>
+          <summary>هل يُخزَّن موقعي أو يُرسل؟</summary>
+          <p>لا. تُقرأ إحداثياتك على الجهاز، وتُستخدم في حساب المواقيت والقبلة محلياً وفي جدولة التنبيهات، ولا تُرسل أي بيانات موقع إلى أي خادم. وإن لم تمنح الإذن أصلاً، يمكنك إدخال إحداثياتك يدوياً من شاشة القبلة.</p>
+        </details>
+        <details>
+          <summary>هل هناك نسخة للآيفون؟</summary>
+          <p>بعد. الشيفرة مبنية بـ Flutter ويوجد مشروع iOS، لكن لا يوجد حتى اليوم بناء منشور على App Store أو TestFlight، فالنور لأندرويد فقط في الوقت الحاضر.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="download">
+    <div class="wrap">
+      <div class="cta">
+        <h2>ثبّت النور ولاحظ الفرق قبل المغرب</h2>
+        <p>تنزيل واحد، بلا حساب، وكل شيء موجود على الجهاز سلفاً. الإصدار القادم على الصفحة نفسها التي فيها الشيفرة.</p>
+        <div class="cta__row">
+          <a class="btn btn--lg" href="https://github.com/seifjo/Back-to-pray/releases" rel="noopener">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-download"/></svg>
+            نزّل ملف APK <span class="btn__os">v1.0.1+5</span>
+          </a>
+          <a class="btn btn--lg btn--ghost" href="https://github.com/seifjo/Back-to-pray" rel="noopener">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-github"/></svg>
+            اقرأ الشيفرة
+          </a>
+        </div>
+        <p class="cta__fine">أندرويد 7.0 أو أحدث · التركيب من خارج المتجر يطلب السماح بمصادر غير معروفة لهذا التنزيل · تقدّمك يبقى بعد التحديث</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div>
+        <a class="brand" href="#top" aria-label="النور — الصفحة الرئيسية">
+          <svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#071A3A"/><path d="M32 12l4.6 11.2L48 27l-11.4 3.8L32 42l-4.6-11.2L16 27l11.4-3.8z" fill="#14FFEC" opacity=".9"/><circle cx="32" cy="27" r="4.2" fill="#D4AF37"/><path d="M20 50h24" stroke="#0D7377" stroke-width="3.4" stroke-linecap="round"/></svg>
+          <span class="brand__text"><span class="brand__ar">النور</span><span class="brand__la">AlNoor</span></span>
+        </a>
+        <p style="margin-block-start:12px;max-inline-size:34ch">رفيقُ صلاة وقرآن وعبادة لأندرويد — مجاني، يعمل دون اتصال، وشيفرته منشورة على GitHub.</p>
+      </div>
+      <div>
+        <h4>التطبيق</h4>
+        <ul>
+          <li><a href="#features">المزايا</a></li>
+          <li><a href="#screens">الشاشات</a></li>
+          <li><a href="#craft">الثيمات والعربية</a></li>
+          <li><a href="#download">التنزيل</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>المشروع</h4>
+        <ul>
+          <li><a href="https://github.com/seifjo/Back-to-pray" rel="noopener">الشيفرة على GitHub</a></li>
+          <li><a href="https://github.com/seifjo/Back-to-pray/releases" rel="noopener">ملاحظات الإصدارات</a></li>
+          <li><a href="https://github.com/seifjo/Back-to-pray/issues" rel="noopener">الإبلاغ عن مشكلة</a></li>
+          <li><a href="index.html" hreflang="en">English page</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>بياناتك</h4>
+        <ul>
+          <li><a href="#privacy">ما يبقى على الجهاز</a></li>
+          <li><a href="#privacy">ما يستخدم الشبكة</a></li>
+          <li><a href="#faq">أسئلة الموقع</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>النور <bdi>v1.0.1+5</bdi> · أندرويد <bdi>7.0+</bdi></span>
+      <span>مشروع منشور على GitHub بلا إعلانات ولا تتبّع.</span>
+      <span class="footer__ar">النور — العودة إلى الصلاة</span>
+    </div>
+  </div>
+</footer>
+
+<script src="site.js" defer></script>
+</body>
+</html>

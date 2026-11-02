@@ -116,9 +116,9 @@ class AdvancedStatsScreen extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white70,
+                      color: const Color(0xFF64748B),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -152,7 +152,7 @@ class AdvancedStatsScreen extends StatelessWidget {
                 Icon(
                   Icons.show_chart,
                   size: 64,
-                  color: Colors.white.withValues(alpha: 0.3),
+                  color: const Color(0xFF64748B).withValues(alpha: 0.6),
                 ),
                 const SizedBox(height: 16),
                 const Text(
@@ -167,7 +167,7 @@ class AdvancedStatsScreen extends StatelessWidget {
                   'يتم عرض البيانات هنا',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white.withValues(alpha: 0.5),
+                    color: const Color(0xFF64748B),
                   ),
                 ),
               ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/quran_race_provider.dart';
 import '../../core/theme/app_theme.dart';
 import 'room_detail_screen.dart';
@@ -31,7 +32,7 @@ class _QuranRaceScreenState extends State<QuranRaceScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('سباق ختم القرآن'),
+        title: Text(context.tr('raceTitle')),
         centerTitle: true,
       ),
       body: Consumer<QuranRaceProvider>(

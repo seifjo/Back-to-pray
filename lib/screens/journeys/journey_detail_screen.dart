@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../models/journey.dart';
+import '../../models/journey.dart';
 import '../../providers/journey_provider.dart';
 import '../../core/theme/app_theme.dart';
+import '../../data/journey_l10n.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Journey Detail Screen
 /// Shows journey information before starting
@@ -13,9 +15,12 @@ class JourneyDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final en = !context.isArabic;
+    final view = JourneyL10n.localize(journey, en);
+    final ink = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.72);
     return Scaffold(
       appBar: AppBar(
-        title: Text(journey.title),
+        title: Text(view.title),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -25,18 +30,18 @@ class JourneyDetailScreen extends StatelessWidget {
             // Header
             Center(
               child: Text(
-                journey.icon,
+                view.icon,
                 style: const TextStyle(fontSize: 80),
               ),
             ),
             const SizedBox(height: 16),
             Center(
               child: Text(
-                journey.description,
+                view.description,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
-                  color: Colors.white70,
+                  color: ink,
                   height: 1.6,
                 ),
               ),
@@ -52,17 +57,17 @@ class JourneyDetailScreen extends StatelessWidget {
               [
                 _buildEffectCard(
                   'تأثيرات الدماغ',
-                  journey.effects.brainEffects,
+                  view.effects.brainEffects,
                   Icons.psychology,
                 ),
                 _buildEffectCard(
                   'تأثيرات الجسم',
-                  journey.effects.bodyEffects,
+                  view.effects.bodyEffects,
                   Icons.favorite,
                 ),
                 _buildEffectCard(
                   'تأثيرات نفسية',
-                  journey.effects.psychologyEffects,
+                  view.effects.psychologyEffects,
                   Icons.sentiment_very_dissatisfied,
                 ),
               ],
@@ -73,7 +78,7 @@ class JourneyDetailScreen extends StatelessWidget {
             // Benefits Section
             _buildSection(
               '✨ فوائد التعافي',
-              journey.benefits.map((benefit) => _buildListItem(benefit, '✓')).toList(),
+              view.benefits.map((benefit) => _buildListItem(benefit, '✓')).toList(),
             ),
 
             const SizedBox(height: 32),
@@ -81,7 +86,7 @@ class JourneyDetailScreen extends StatelessWidget {
             // Stages Section
             _buildSection(
               '📊 مراحل الرحلة',
-              journey.stages.asMap().entries.map((entry) {
+              view.stages.asMap().entries.map((entry) {
                 final index = entry.key + 1;
                 final stage = entry.value;
                 return _buildStageCard(index, stage);
@@ -108,16 +113,18 @@ class JourneyDetailScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'مدة التعافي المتوقعة',
+                        Text(
+                          en ? 'Expected duration' : 'مدة التعافي المتوقعة',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.white70,
+                            color: ink,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '~${journey.recommendedDays} يوم',
+                          en
+                              ? '~${view.recommendedDays} days'
+                              : '~${view.recommendedDays} يوم',
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -136,7 +143,7 @@ class JourneyDetailScreen extends StatelessWidget {
             // Tips Section
             _buildSection(
               '💡 نصائح وإرشادات',
-              journey.tips.map((tip) => _buildListItem(tip, '•')).toList(),
+              view.tips.map((tip) => _buildListItem(tip, '•')).toList(),
             ),
 
             const SizedBox(height: 40),
@@ -145,7 +152,7 @@ class JourneyDetailScreen extends StatelessWidget {
             // Active Journey Status or Start Button
             Consumer<JourneyProvider>(
               builder: (context, provider, child) {
-                final isActive = provider.activeJourneyId == journey.id;
+                final isActive = provider.activeJourneyId == view.id;
                 
                 if (isActive) {
                   return Container(
@@ -159,8 +166,8 @@ class JourneyDetailScreen extends StatelessWidget {
                       ),
                     ),
                     child: Column(
-                      children: const [
-                        Icon(Icons.check_circle, color: AppTheme.accentGold, size: 48),
+                      children: [
+                        const Icon(Icons.check_circle, color: AppTheme.accentGold, size: 48),
                         SizedBox(height: 16),
                         Text(
                           'أنت في هذه الرحلة حالياً',
@@ -173,7 +180,7 @@ class JourneyDetailScreen extends StatelessWidget {
                         SizedBox(height: 8),
                         Text(
                           'يتم تسجيل تقدمك يومياً',
-                          style: TextStyle(color: Colors.white70),
+                          style: TextStyle(color: ink),
                         ),
                       ],
                     ),
@@ -268,7 +275,7 @@ class JourneyDetailScreen extends StatelessWidget {
                   content.trim(),
                   style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.white70,
+                    color: Color(0xFF64748B),
                     height: 1.5,
                   ),
                 ),
@@ -327,7 +334,7 @@ class JourneyDetailScreen extends StatelessWidget {
             stage.description,
             style: const TextStyle(
               fontSize: 14,
-              color: Colors.white70,
+              color: Color(0xFF64748B),
               height: 1.5,
             ),
           ),
@@ -367,30 +374,32 @@ class JourneyDetailScreen extends StatelessWidget {
 
   void _startJourney(BuildContext context) async {
     final journeyProvider = context.read<JourneyProvider>();
+    final en = !context.isArabic;
+    final view = JourneyL10n.localize(journey, en);
 
     // Show confirmation dialog
     final shouldStart = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('هل أنت مستعد؟'),
+        title: Text(en ? 'Ready to begin?' : 'هل أنت مستعد؟'),
         content: Text(
-          'أنت على وشك البدء في "${journey.title}"\n\n'
-          'هذه رحلة تحتاج إلى التزام وعزيمة. ستحتاج إلى تسجيل التزامك اليومي.\n\n'
-          'هل أنت جاهز للبدء؟',
+          en
+              ? 'You are about to start "${view.title}".\n\nThis needs daily commitment. Are you ready?'
+              : 'أنت على وشك البدء في "${view.title}"\n\nهذه رحلة تحتاج إلى التزام وعزيمة. ستحتاج إلى تسجيل التزامك اليومي.\n\nهل أنت جاهز للبدء؟',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('لا، ليس الآن'),
+            child: Text(en ? 'Not now' : 'لا، ليس الآن'),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryGreen,
             ),
-            child: const Text(
-              'نعم، ابدأ الآن',
-              style: TextStyle(color: Colors.white),
+            child: Text(
+              en ? 'Yes, start now' : 'نعم، ابدأ الآن',
+              style: const TextStyle(color: Colors.white),
             ),
           ),
         ],
@@ -398,7 +407,7 @@ class JourneyDetailScreen extends StatelessWidget {
     );
 
     if (shouldStart == true && context.mounted) {
-      await journeyProvider.startJourney(journey.id);
+      await journeyProvider.startJourney(view.id);
 
       if (context.mounted) {
         // Show success message

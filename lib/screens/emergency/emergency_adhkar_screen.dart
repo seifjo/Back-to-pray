@@ -76,7 +76,7 @@ class _EmergencyAdhkarScreenState extends State<EmergencyAdhkarScreen>
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 24),
         ),
-        content: const Column(
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
@@ -98,7 +98,10 @@ class _EmergencyAdhkarScreenState extends State<EmergencyAdhkarScreen>
             Text(
               'استمر في المقاومة... الشهوة مؤقتة، لكن النصر أبدي',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.white70),
+              style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
             ),
           ],
         ),
@@ -231,20 +234,20 @@ class _EmergencyAdhkarScreenState extends State<EmergencyAdhkarScreen>
                                 Text(
                                   dhikr['arabic']!,
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 28,
                                     fontWeight: FontWeight.bold,
                                     height: 2,
-                                    color: Colors.white,
+                                    color: Theme.of(context).colorScheme.onSurface,
                                   ),
                                 ),
                                 const SizedBox(height: 20),
                                 Text(
                                   dhikr['meaning']!,
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 16,
-                                    color: Colors.white70,
+                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                     height: 1.8,
                                   ),
                                 ),

@@ -243,6 +243,18 @@ class JourneyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Start the same journey again from day one.
+  Future<void> restartJourney() async {
+    if (_activeJourney == null) return;
+    _activeJourney = ActiveJourney(
+      journeyId: _activeJourney!.journeyId,
+      startDate: DateTime.now(),
+      status: JourneyStatus.active,
+    );
+    await _saveActiveJourney();
+    notifyListeners();
+  }
+
   /// Reset journey (for testing or user request)
   Future<void> resetJourney() async {
     _activeJourney = null;

@@ -50,6 +50,7 @@ dependencies:
   # Notifications
   flutter_local_notifications: ^17.0.0
   timezone: ^0.9.2
+  flutter_timezone: ^4.1.1
   
   # Qibla/Compass
   flutter_compass: ^0.8.0
@@ -59,6 +60,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   shared_preferences: ^2.2.2
+  path_provider: ^2.1.5
   
   # HTTP for potential API calls
   http: ^1.2.0
@@ -82,8 +84,12 @@ dependencies:
   uuid: ^4.5.1
   share_plus: ^10.1.4
 
-  # Audio - Quran recitation
+  # Audio - shared player + Android media session / background playback
   just_audio: ^0.9.36
+  audio_service: ^0.18.16
+  audio_session: ^0.1.25
+  hijri: ^3.0.1
+  url_launcher: ^6.3.3
 
 dev_dependencies:
   flutter_test:
@@ -101,6 +107,9 @@ flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/images/app_icon.png"
+  adaptive_icon_background: "#071A3A"
+  adaptive_icon_foreground: "assets/images/app_icon.png"
+  remove_alpha_ios: true
   min_sdk_android: 21
 
 # For information on the generic Dart part of this file, see the
@@ -117,7 +126,10 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
-    - assets/images/
+    - assets/audio/
+    - assets/Anashed/
+    - assets/quran/
+    - assets/hadith/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/docs/development/ui/assets-and-images#resolution-aware

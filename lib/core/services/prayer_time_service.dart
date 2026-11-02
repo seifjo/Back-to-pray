@@ -15,11 +15,13 @@ class PrayerTimeService {
     required double latitude,
     required double longitude,
     models.CalculationMethod method = models.CalculationMethod.egyptianGeneralAuthority,
+    DateTime? forDate,
   }) async {
     try {
+      final day = forDate ?? DateTime.now();
       final coordinates = Coordinates(latitude, longitude);
       final params = _getCalculationParameters(method);
-      final date = DateComponents.from(DateTime.now());
+      final date = DateComponents.from(day);
       
       final prayerTimes = PrayerTimes(coordinates, date, params);
 
@@ -30,7 +32,7 @@ class PrayerTimeService {
         asr: prayerTimes.asr,
         maghrib: prayerTimes.maghrib,
         isha: prayerTimes.isha,
-        date: DateTime.now(),
+        date: DateTime(day.year, day.month, day.day),
       );
     } catch (e) {
       print('Error calculating prayer times: $e');
@@ -90,10 +92,18 @@ class PrayerTimeService {
       throw Exception('Location permissions are permanently denied. Please open your phone settings and allow location access for this app.');
     }
 
-    // Get current position
-    return await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
+    try {
+      return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.low,
+        timeLimit: const Duration(seconds: 8),
+      );
+    } catch (_) {
+      return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.low,
+        forceAndroidLocationManager: true,
+        timeLimit: const Duration(seconds: 10),
+      );
+    }
   }
 
   /// Save calculation method preference
@@ -130,29 +140,79 @@ class PrayerTimeService {
 
   /// Get prayer times for today (with cached location)
   Future<models.PrayerTimes> getTodayPrayerTimes() async {
+    final pair = await getTodayAndTomorrow();
+    return pair.today;
+  }
+
+  /// Today and tomorrow, so a prayer that has passed can be scheduled tomorrow
+  /// with that day's actual calculated time.
+  Future<({models.PrayerTimes today, models.PrayerTimes tomorrow})>
+      getTodayAndTomorrow() async {
+    final location = await _resolveLocation();
+    final method = await getSavedCalculationMethod();
+    final now = DateTime.now();
+    final today = await calculatePrayerTimes(
+      latitude: location.latitude,
+      longitude: location.longitude,
+      method: method,
+      forDate: now,
+    );
+    final tomorrow = await calculatePrayerTimes(
+      latitude: location.latitude,
+      longitude: location.longitude,
+      method: method,
+      forDate: now.add(const Duration(days: 1)),
+    );
+    return (today: today, tomorrow: tomorrow);
+  }
+
+  Future<({double latitude, double longitude})> _resolveLocation() async {
+    final permission = await _ensurePermission();
+    final allowed = permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse;
+
+    if (allowed) {
+      try {
+        final known = await Geolocator.getLastKnownPosition();
+        if (known != null) {
+          await saveLastLocation(known.latitude, known.longitude);
+          return (latitude: known.latitude, longitude: known.longitude);
+        }
+      } catch (_) {}
+    }
+
     try {
-      // Try to get current location
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        throw Exception('Location services are disabled.');
+      }
+      if (!allowed) {
+        throw Exception('Location permissions are denied.');
+      }
       final position = await getCurrentLocation();
       await saveLastLocation(position.latitude, position.longitude);
-      
-      final method = await getSavedCalculationMethod();
-      return await calculatePrayerTimes(
-        latitude: position.latitude,
-        longitude: position.longitude,
-        method: method,
-      );
+      return (latitude: position.latitude, longitude: position.longitude);
     } catch (e) {
-      // If location fails, try to use last saved location
+      final known = await Geolocator.getLastKnownPosition();
+      if (known != null) {
+        await saveLastLocation(known.latitude, known.longitude);
+        return (latitude: known.latitude, longitude: known.longitude);
+      }
       final lastLocation = await getLastLocation();
       if (lastLocation != null) {
-        final method = await getSavedCalculationMethod();
-        return await calculatePrayerTimes(
+        return (
           latitude: lastLocation['latitude']!,
           longitude: lastLocation['longitude']!,
-          method: method,
         );
       }
       rethrow;
     }
+  }
+
+  Future<LocationPermission> _ensurePermission() async {
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    return permission;
   }
 }

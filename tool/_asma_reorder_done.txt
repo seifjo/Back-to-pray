@@ -1,0 +1,11 @@
+1 ar-rahmaan الرحمن
+2 ar-raheem الرحيم
+3 al-malik الملك
+4 al-quddoos القدوس
+5 as-salaam السلام
+6 al-mumin المؤمن
+7 al-muhaymin المهيمن
+8 al-azeez العزيز
+9 al-jabbaar الجبار
+10 al-mutakabbir المتكبر
+TOTAL=99

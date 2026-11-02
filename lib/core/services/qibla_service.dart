@@ -8,9 +8,36 @@ class QiblaService {
   static const double kaabaLatitude = 21.4225;
   static const double kaabaLongitude = 39.8262;
 
+  /// Shortest absolute difference between two bearings, in degrees.
+  static double angularDifference(double heading, double qiblaBearing) {
+    final delta = (qiblaBearing - heading) % 360;
+    final wrapped = delta < 0 ? delta + 360 : delta;
+    return wrapped > 180 ? 360 - wrapped : wrapped;
+  }
+
+  /// Signed turn from the current heading toward the Qibla, -180 to 180.
+  static double signedOffset(double heading, double qiblaBearing) {
+    final delta = (qiblaBearing - heading + 540) % 360 - 180;
+    return delta;
+  }
+
+  static bool isAligned(double heading, double qiblaBearing, {double tolerance = 5}) {
+    return angularDifference(heading, qiblaBearing) <= tolerance;
+  }
+
+  /// Calculate Qibla direction (bearing) from current location
+  /// Returns bearing in degrees (0-360)
+  double bearingFrom(double userLat, double userLon) {
+    return _bearing(userLat, userLon);
+  }
+
   /// Calculate Qibla direction (bearing) from current location
   /// Returns bearing in degrees (0-360)
   Future<double> calculateQiblaDirection(double userLat, double userLon) async {
+    return _bearing(userLat, userLon);
+  }
+
+  double _bearing(double userLat, double userLon) {
     // Convert to радианы
     final lat1 = _degreesToRadians(userLat);
     final lon1 = _degreesToRadians(userLon);

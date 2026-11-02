@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/reward.dart';
 import '../../core/theme/app_theme.dart';
 
@@ -62,7 +63,7 @@ class RewardCard extends StatelessWidget {
 
                 // Title
                 Text(
-                  reward.title,
+                  context.isArabic ? reward.title : _englishTitle(reward.id),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -74,10 +75,12 @@ class RewardCard extends StatelessWidget {
 
                 // Description
                 Text(
-                  reward.description,
+                  context.isArabic
+                      ? reward.description
+                      : _englishDescription(reward.id),
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                   textAlign: TextAlign.center,
                   maxLines: 3,
@@ -105,7 +108,9 @@ class RewardCard extends StatelessWidget {
                       children: [
                         const Icon(Icons.shopping_cart, size: 16),
                         const SizedBox(width: 8),
-                        Text('${reward.cost} نقطة'),
+                        Text(context.isArabic
+                            ? '${reward.cost} نقطة'
+                            : '${reward.cost} pts'),
                       ],
                     ),
                   )
@@ -151,5 +156,41 @@ class RewardCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _englishTitle(String id) {
+    const titles = {
+      'theme_ocean': 'Ocean theme',
+      'theme_sunset': 'Sunset theme',
+      'theme_forest': 'Forest theme',
+      'theme_purple': 'Purple theme',
+      'theme_gold': 'Gold theme',
+      'theme_moonlight': 'Moonlight theme',
+      'badge_warrior': 'Prayer warrior badge',
+      'badge_phoenix': 'Phoenix badge',
+      'badge_saint': 'Steadfast badge',
+      'feature_stats': 'Prayer statistics',
+      'feature_goals': 'Custom goals',
+      'feature_export': 'Export your data',
+    };
+    return titles[id] ?? id;
+  }
+
+  String _englishDescription(String id) {
+    const descriptions = {
+      'theme_ocean': 'Applies a deep blue look to the whole app.',
+      'theme_sunset': 'Applies warm amber colors to the whole app.',
+      'theme_forest': 'Applies green tones to the whole app.',
+      'theme_purple': 'Applies a violet look to the whole app.',
+      'theme_gold': 'Applies a gold look to the whole app.',
+      'theme_moonlight': 'Applies a calm night look to the whole app.',
+      'badge_warrior': 'Shows on your achievements page after you own it.',
+      'badge_phoenix': 'Shows on your achievements page after you own it.',
+      'badge_saint': 'Shows on your achievements page after you own it.',
+      'feature_stats': 'Opens your prayer and recovery statistics.',
+      'feature_goals': 'Opens custom recovery goals.',
+      'feature_export': 'Exports a copy of your saved data.',
+    };
+    return descriptions[id] ?? id;
   }
 }

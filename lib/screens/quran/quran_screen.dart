@@ -1,11 +1,18 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:just_audio/just_audio.dart';
+import '../../core/services/islamic_audio_player.dart';
+import '../../core/services/quran_audio_catalog.dart';
+import '../../core/services/quran_offline_store.dart';
 import '../../core/services/quran_service.dart';
+import '../../models/islamic_audio.dart';
 import '../../models/quran.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/quran_data.dart';
+import '../../l10n/app_localizations.dart';
+import '../../providers/app_settings_provider.dart';
+import '../../providers/quran_audio_settings_provider.dart';
 import '../../providers/quran_provider.dart';
 import '../../providers/daily_achievements_provider.dart';
 import '../../providers/quran_race_provider.dart';
@@ -20,69 +27,169 @@ class QuranScreen extends StatefulWidget {
 class _QuranScreenState extends State<QuranScreen> {
   final QuranService _quranService = QuranService();
   late Future<List<Surah>> _surahsFuture;
-
-  // Audio player for full surah playback
-  final AudioPlayer _audioPlayer = AudioPlayer();
-  int? _playingSurahNumber;
-  bool _isPlaying = false;
+  final Set<int> _savedSurahs = {};
+  int? _savingSurah;
+  String? _trackedReciterId;
 
   @override
   void initState() {
     super.initState();
     _surahsFuture = Future.value(QuranData.surahs);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _refreshSaved());
   }
 
   @override
-  void dispose() {
-    _audioPlayer.stop();
-    _audioPlayer.dispose();
-    super.dispose();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final reciterId = context.watch<QuranAudioSettingsProvider>().reciterId;
+    if (_trackedReciterId != reciterId) {
+      _trackedReciterId = reciterId;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _refreshSaved();
+      });
+    }
+  }
+
+  Future<void> _refreshSaved() async {
+    final reciterId = context.read<QuranAudioSettingsProvider>().reciterId;
+    final saved = <int>{};
+    for (var number = 1; number <= 114; number++) {
+      if (await QuranOfflineStore.isSaved(number, reciterId: reciterId)) {
+        saved.add(number);
+      }
+    }
+    if (mounted) {
+      setState(() {
+        _savedSurahs
+          ..clear()
+          ..addAll(saved);
+      });
+    }
   }
 
   Future<void> _playSurah(Surah surah) async {
-    // Same surah: toggle pause/resume
-    if (_playingSurahNumber == surah.number) {
-      if (_isPlaying) {
-        await _audioPlayer.pause();
-        setState(() => _isPlaying = false);
-      } else {
-        await _audioPlayer.play();
-        setState(() => _isPlaying = true);
-      }
+    final player = context.read<IslamicAudioPlayer>();
+    final audioSettings = context.read<QuranAudioSettingsProvider>();
+    final reciter = audioSettings.reciter;
+    final currentId = 'quran_surah_${surah.number}';
+    final sameReciter =
+        player.current?.extras['reciterId'] == reciter.id;
+
+    if (player.isCurrent(currentId) && sameReciter) {
+      await player.togglePlayPause();
       return;
     }
 
-    setState(() { _playingSurahNumber = surah.number; _isPlaying = true; });
+    if (!reciter.surahAvailable) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('reciterSurahUnavailable'))),
+      );
+      return;
+    }
 
+    final queue = QuranAudioCatalog.surahQueueFrom(
+      QuranData.surahs,
+      surah.number,
+      reciter: reciter,
+      includeFollowing: audioSettings.autoPlayNextSurah,
+    );
+    if (queue.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('reciterSurahUnavailable'))),
+      );
+      return;
+    }
+
+    final localPaths = <String, String?>{};
+    for (final track in queue.take(5)) {
+      final number = int.tryParse(track.extras['surahNumber'] ?? '');
+      if (number != null &&
+          await QuranOfflineStore.isSaved(number, reciterId: reciter.id)) {
+        localPaths[track.id] =
+            (await QuranOfflineStore.fileFor(number, reciterId: reciter.id))
+                .path;
+      }
+    }
+    if (await QuranOfflineStore.isSaved(surah.number, reciterId: reciter.id)) {
+      localPaths[currentId] =
+          (await QuranOfflineStore.fileFor(surah.number, reciterId: reciter.id))
+              .path;
+    }
+    await player.playQueue(
+      queue,
+      startIndex: 0,
+      localPaths: localPaths,
+    );
+  }
+
+  Future<void> _saveOne(int number) async {
+    if (_savedSurahs.contains(number)) return;
+    final audioSettings = context.read<QuranAudioSettingsProvider>();
+    if (!audioSettings.offlineDownloadsEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('quranOfflineDisabled'))),
+      );
+      return;
+    }
+    if (!audioSettings.reciter.surahAvailable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('reciterSurahUnavailable'))),
+      );
+      return;
+    }
+    setState(() => _savingSurah = number);
     try {
-      // CDN full surah MP3: everyayah.com / mp3quran.net
-      final paddedNum = surah.number.toString().padLeft(3, '0');
-      final url = 'https://server8.mp3quran.net/afs/$paddedNum.mp3';
-      await _audioPlayer.setUrl(url);
-      await _audioPlayer.play();
-
-      _audioPlayer.playerStateStream.listen((state) {
-        if (state.processingState == ProcessingState.completed) {
-          if (mounted) setState(() => _isPlaying = false);
-        }
-      });
-    } catch (e) {
-      debugPrint('Surah audio error: $e');
-      if (mounted) setState(() { _playingSurahNumber = null; _isPlaying = false; });
+      QuranOfflineStore.cancelAll = false;
+      await QuranOfflineStore.downloadSurah(
+        number,
+        reciter: audioSettings.reciter,
+      );
+      if (mounted) setState(() => _savedSurahs.add(number));
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.tr('error'))),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _savingSurah = null);
     }
   }
 
   void _stopAudio() {
-    _audioPlayer.stop();
-    setState(() { _playingSurahNumber = null; _isPlaying = false; });
+    context.read<IslamicAudioPlayer>().clear();
+  }
+
+  Future<void> _openOfflineSaver() async {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const _QuranDownloadDialog(),
+    );
+    await _refreshSaved();
   }
 
   @override
   Widget build(BuildContext context) {
+    final player = context.watch<IslamicAudioPlayer>();
+    final playingSurah = player.current?.id.startsWith('quran_surah_') == true
+        ? int.tryParse(player.current?.extras['surahNumber'] ?? '')
+        : null;
+    final isPlayingSurah = playingSurah != null && player.isPlaying;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('القرآن الكريم', style: TextStyle(fontWeight: FontWeight.bold)),
-        bottom: _playingSurahNumber != null ? PreferredSize(
+        title: Text(context.tr('quranTitle'), style: const TextStyle(fontWeight: FontWeight.bold)),
+        actions: [
+          IconButton(
+            tooltip: context.tr('saveQuran'),
+            onPressed: _openOfflineSaver,
+            icon: const Icon(Icons.download_for_offline_outlined),
+          ),
+        ],
+        bottom: playingSurah != null ? PreferredSize(
           preferredSize: const Size.fromHeight(44),
           child: Container(
             height: 44,
@@ -94,17 +201,17 @@ class _QuranScreenState extends State<QuranScreen> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'يُشغَّل: ${QuranData.surahs.firstWhere((s) => s.number == _playingSurahNumber).name}',
+                    'يُشغَّل: ${QuranData.surahs.firstWhere((s) => s.number == playingSurah).name}',
                     style: TextStyle(fontSize: 13, color: AppTheme.primaryGreen, fontWeight: FontWeight.w600),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 IconButton(
                   icon: Icon(
-                    _isPlaying ? Icons.pause_circle : Icons.play_circle,
+                    isPlayingSurah ? Icons.pause_circle : Icons.play_circle,
                     color: AppTheme.primaryGreen,
                   ),
-                  onPressed: () => _playSurah(QuranData.surahs.firstWhere((s) => s.number == _playingSurahNumber)),
+                  onPressed: () => _playSurah(QuranData.surahs.firstWhere((s) => s.number == playingSurah)),
                 ),
                 IconButton(
                   icon: const Icon(Icons.stop_circle, color: Colors.red),
@@ -174,7 +281,7 @@ class _QuranScreenState extends State<QuranScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemBuilder: (context, index) {
                     final surah = surahs[index];
-                    final isThisSurahPlaying = _playingSurahNumber == surah.number;
+                    final isThisSurahPlaying = playingSurah == surah.number;
                     return Card(
                       margin: const EdgeInsets.only(bottom: 12),
                       child: ListTile(
@@ -182,7 +289,7 @@ class _QuranScreenState extends State<QuranScreen> {
                           backgroundColor: isThisSurahPlaying
                               ? AppTheme.accentGold
                               : AppTheme.primaryGreen,
-                          child: isThisSurahPlaying && _isPlaying
+                          child: isThisSurahPlaying && isPlayingSurah
                               ? const Icon(Icons.graphic_eq, color: Colors.white, size: 20)
                               : Text(
                                   '${surah.number}',
@@ -190,18 +297,42 @@ class _QuranScreenState extends State<QuranScreen> {
                                 ),
                         ),
                         title: Text(
-                          surah.name,
+                          context.isArabic ? surah.name : surah.englishName,
                           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.right,
                         ),
-                        subtitle: Text(surah.englishName, textAlign: TextAlign.right),
+                        subtitle: Text(
+                          context.isArabic ? surah.englishName : surah.name,
+                          textAlign: TextAlign.right,
+                        ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // Audio play button
+                            IconButton(
+                              tooltip: _savedSurahs.contains(surah.number)
+                                  ? context.tr('audioSaved')
+                                  : context.tr('saveQuran'),
+                              icon: _savingSurah == surah.number
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    )
+                                  : Icon(
+                                      _savedSurahs.contains(surah.number)
+                                          ? Icons.offline_pin
+                                          : Icons.download_outlined,
+                                      color: _savedSurahs.contains(surah.number)
+                                          ? AppTheme.primaryGreen
+                                          : Colors.grey,
+                                    ),
+                              onPressed: _savingSurah == null
+                                  ? () => _saveOne(surah.number)
+                                  : null,
+                            ),
                             IconButton(
                               icon: Icon(
-                                isThisSurahPlaying && _isPlaying
+                                isThisSurahPlaying && isPlayingSurah
                                     ? Icons.pause_circle_filled
                                     : Icons.play_circle_filled,
                                 color: isThisSurahPlaying
@@ -250,11 +381,6 @@ class _SurahDetailScreenState extends State<SurahDetailScreen> with WidgetsBindi
   bool _isAutoScrolling = false;
   Timer? _scrollDebounce;
   int _ayahCount = 0;
-  
-  // Audio player
-  final AudioPlayer _audioPlayer = AudioPlayer();
-  int? _playingAyahIndex;
-  bool _isAudioPlaying = false;
 
   // Safe reference for dispose()
   late QuranRaceProvider _raceProvider;
@@ -282,8 +408,6 @@ class _SurahDetailScreenState extends State<SurahDetailScreen> with WidgetsBindi
   @override
   void dispose() {
     _scrollDebounce?.cancel();
-    _audioPlayer.stop();
-    _audioPlayer.dispose();
     WidgetsBinding.instance.removeObserver(this);
     // User stopped reading
     _raceProvider.setReadingStatus(false);
@@ -391,63 +515,91 @@ class _SurahDetailScreenState extends State<SurahDetailScreen> with WidgetsBindi
     }
   }
 
-  /// Play or pause a specific ayah audio
+  /// Play or pause a specific ayah audio via the global player.
   Future<void> _playAyah(int index, int ayahNumber) async {
-    if (_playingAyahIndex == index && _isAudioPlaying) {
-      await _audioPlayer.pause();
-      setState(() => _isAudioPlaying = false);
+    final player = context.read<IslamicAudioPlayer>();
+    final audioSettings = context.read<QuranAudioSettingsProvider>();
+    final reciter = audioSettings.reciter;
+    final absolute =
+        QuranAudioCatalog.absoluteAyahNumber(widget.surah.number, ayahNumber);
+    final trackId = 'quran_ayah_$absolute';
+    final sameReciter = player.current?.extras['reciterId'] == reciter.id;
+
+    if (player.isCurrent(trackId) && sameReciter) {
+      await player.togglePlayPause();
       return;
     }
-    if (_playingAyahIndex == index && !_isAudioPlaying) {
-      await _audioPlayer.play();
-      setState(() => _isAudioPlaying = true);
+
+    if (!reciter.hasAyahAudio) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('reciterAyahUnavailable'))),
+      );
       return;
     }
 
-    setState(() { _playingAyahIndex = index; _isAudioPlaying = true; });
-
-    try {
-      final absolute = _getAbsoluteAyahNumber(widget.surah.number, ayahNumber);
-      final url = 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/$absolute.mp3';
-      await _audioPlayer.setUrl(url);
-      await _audioPlayer.play();
-
-      _audioPlayer.playerStateStream.listen((state) {
-        if (state.processingState == ProcessingState.completed) {
-          if (mounted) setState(() => _isAudioPlaying = false);
-        }
-      });
-    } catch (e) {
-      debugPrint('Audio error: $e');
-      if (mounted) setState(() { _playingAyahIndex = null; _isAudioPlaying = false; });
+    final quality = reciter.resolveAyahBitrate(audioSettings.ayahQualityKbps) ??
+        audioSettings.ayahQualityKbps;
+    final track = QuranAudioCatalog.ayah(
+      surahNumber: widget.surah.number,
+      surahNameEn: widget.surah.englishName,
+      surahNameAr: widget.surah.name,
+      ayahNumber: ayahNumber,
+      absoluteAyah: absolute,
+      reciter: reciter,
+      qualityKbps: quality,
+    );
+    if (track == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('reciterAyahUnavailable'))),
+      );
+      return;
     }
-  }
 
-  int _getAbsoluteAyahNumber(int surahNumber, int ayahNumber) {
-    const ayahsPerSurah = [
-      7,286,200,176,120,165,206,75,129,109,123,111,43,52,99,128,111,110,98,135,
-      112,78,118,64,77,227,93,88,69,60,34,30,73,54,45,83,182,88,75,85,
-      54,53,89,59,37,35,38,29,18,45,60,49,62,55,78,96,29,22,24,13,
-      14,11,11,18,12,12,30,52,52,44,28,28,20,56,40,31,50,40,46,42,
-      29,19,36,25,22,17,19,26,30,20,15,21,11,8,8,19,5,8,8,11,
-      11,8,3,9,5,4,7,3,6,3,5,4,5,6,
-    ];
-    int absolute = 0;
-    for (int i = 0; i < surahNumber - 1; i++) absolute += ayahsPerSurah[i];
-    return absolute + ayahNumber;
+    String? localPath;
+    if (await QuranOfflineStore.isAyahSaved(
+      absolute,
+      reciterId: reciter.id,
+      qualityKbps: quality,
+    )) {
+      localPath = (await QuranOfflineStore.ayahFile(
+        absolute,
+        reciterId: reciter.id,
+        qualityKbps: quality,
+      ))
+          .path;
+    } else if (audioSettings.offlineDownloadsEnabled) {
+      QuranOfflineStore.downloadAyah(
+        absolute,
+        reciter: reciter,
+        qualityKbps: quality,
+      );
+    }
+    await player.playTrack(track, localFilePath: localPath);
   }
 
   void _stopAudio() {
-    _audioPlayer.stop();
-    setState(() { _playingAyahIndex = null; _isAudioPlaying = false; });
+    context.read<IslamicAudioPlayer>().clear();
   }
 
   @override
   Widget build(BuildContext context) {
+    final player = context.watch<IslamicAudioPlayer>();
+    final currentAyah = player.current?.kind == IslamicAudioKind.quran
+        ? int.tryParse(player.current?.extras['ayahNumber'] ?? '')
+        : null;
+    final currentSurah = int.tryParse(player.current?.extras['surahNumber'] ?? '');
+    final playingAyahIndex =
+        currentSurah == widget.surah.number && currentAyah != null
+            ? currentAyah - 1
+            : null;
+    final isAudioPlaying = playingAyahIndex != null && player.isPlaying;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.surah.name),
-        bottom: _playingAyahIndex != null ? PreferredSize(
+        bottom: playingAyahIndex != null ? PreferredSize(
           preferredSize: const Size.fromHeight(44),
           child: Container(
             height: 44,
@@ -461,16 +613,16 @@ class _SurahDetailScreenState extends State<SurahDetailScreen> with WidgetsBindi
                 Icon(Icons.headphones, size: 16, color: AppTheme.primaryGreen),
                 const SizedBox(width: 8),
                 Text(
-                  'يُشغَّل: الآية ${_playingAyahIndex! + 1}',
+                  'يُشغَّل: الآية ${playingAyahIndex + 1}',
                   style: TextStyle(fontSize: 13, color: AppTheme.primaryGreen, fontWeight: FontWeight.w600),
                 ),
                 const Spacer(),
                 IconButton(
                   icon: Icon(
-                    _isAudioPlaying ? Icons.pause_circle : Icons.play_circle,
+                    isAudioPlaying ? Icons.pause_circle : Icons.play_circle,
                     color: AppTheme.primaryGreen,
                   ),
-                  onPressed: () => _playAyah(_playingAyahIndex!, _playingAyahIndex! + 1),
+                  onPressed: () => _playAyah(playingAyahIndex, playingAyahIndex + 1),
                 ),
                 IconButton(
                   icon: const Icon(Icons.stop_circle, color: Colors.red),
@@ -551,11 +703,11 @@ class _SurahDetailScreenState extends State<SurahDetailScreen> with WidgetsBindi
                                   ),
                                   IconButton(
                                     icon: Icon(
-                                      _playingAyahIndex == index && _isAudioPlaying
+                                      playingAyahIndex == index && isAudioPlaying
                                           ? Icons.pause_circle_filled
                                           : Icons.play_circle_filled,
                                       size: 28,
-                                      color: _playingAyahIndex == index
+                                      color: playingAyahIndex == index
                                           ? AppTheme.primaryGreen
                                           : Colors.grey.withValues(alpha: 0.5),
                                     ),
@@ -584,7 +736,12 @@ class _SurahDetailScreenState extends State<SurahDetailScreen> with WidgetsBindi
                           const SizedBox(height: 16),
                           Text(
                             ayah.text,
-                            style: AppTheme.quranArabic,
+                            style: GoogleFonts.amiri(
+                              fontSize: context.watch<AppSettingsProvider>().adhkarFontSize,
+                              height: 1.9,
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontWeight: FontWeight.w500,
+                            ),
                             textAlign: TextAlign.right,
                             textDirection: TextDirection.rtl,
                           ),
@@ -597,6 +754,121 @@ class _SurahDetailScreenState extends State<SurahDetailScreen> with WidgetsBindi
           );
         },
       ),
+    );
+  }
+}
+
+class _QuranDownloadDialog extends StatefulWidget {
+  const _QuranDownloadDialog();
+
+  @override
+  State<_QuranDownloadDialog> createState() => _QuranDownloadDialogState();
+}
+
+class _QuranDownloadDialogState extends State<_QuranDownloadDialog> {
+  bool _running = false;
+  int _done = 0;
+  int _current = 0;
+  double _fraction = 0;
+  bool _finished = false;
+
+  Future<void> _start() async {
+    final audioSettings = context.read<QuranAudioSettingsProvider>();
+    if (!audioSettings.offlineDownloadsEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('quranOfflineDisabled'))),
+      );
+      return;
+    }
+    if (!audioSettings.reciter.surahAvailable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('reciterSurahUnavailable'))),
+      );
+      return;
+    }
+    final reciter = audioSettings.reciter;
+    setState(() {
+      _running = true;
+      _finished = false;
+      _done = 0;
+    });
+    QuranOfflineStore.cancelAll = false;
+    for (var number = 1; number <= 114; number++) {
+      if (!mounted || QuranOfflineStore.cancelAll) break;
+      setState(() {
+        _current = number;
+        _fraction = 0;
+      });
+      if (await QuranOfflineStore.isSaved(number, reciterId: reciter.id)) {
+        setState(() => _done++);
+        continue;
+      }
+      try {
+        await QuranOfflineStore.downloadSurah(
+          number,
+          reciter: reciter,
+          onProgress: (progress) {
+            if (mounted) setState(() => _fraction = progress);
+          },
+        );
+      } catch (_) {
+        if (mounted) {
+          setState(() => _running = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(context.tr('error'))),
+          );
+        }
+        return;
+      }
+      if (mounted && !QuranOfflineStore.cancelAll) {
+        setState(() => _done++);
+      }
+    }
+    if (mounted) {
+      setState(() {
+        _running = false;
+        _finished = !QuranOfflineStore.cancelAll;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(context.tr('saveQuran')),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(context.tr('quranTextReady')),
+          const SizedBox(height: 12),
+          Text(context.tr('saveAudioHelp')),
+          if (_running || _finished) ...[
+            const SizedBox(height: 16),
+            Text('${context.tr('savingSurah')} $_current  •  $_done / 114'),
+            const SizedBox(height: 8),
+            LinearProgressIndicator(value: _running ? _fraction : 1),
+          ],
+          if (_finished) ...[
+            const SizedBox(height: 12),
+            Text(context.tr('audioSaved')),
+          ],
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            QuranOfflineStore.cancelAll = true;
+            Navigator.pop(context);
+          },
+          child: Text(_running ? context.tr('cancelDownload') : context.tr('close')),
+        ),
+        if (!_running && !_finished)
+          FilledButton(
+            onPressed: _start,
+            child: Text(context.tr('saveAudio')),
+          ),
+      ],
     );
   }
 }
